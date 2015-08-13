@@ -1,8 +1,6 @@
 import RPi.GPIO as GPIO
 import time
 
-
-
 class Servo:
   """ Wrapper interface to a Servo."""
   
@@ -39,10 +37,14 @@ class Servo:
       self.curr_pos = angle
       set_angle(self.curr_pos)
       time.sleep(self.move_delay)
+
+  def get_current_pos(self):
+    return self.curr_pos
           
 if (__name__ == "__main__"):
-  servo = Servo(3, 0)
-  while True:
-    servo.move_to(180)
-    servo.move_to(0)
+  servo_pins = []
+  for pin in servo_pins:
+    servo = Servo(pin, 30)
+    servo.move_to(50)
+    servo.move_to(30)
     
