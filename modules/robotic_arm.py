@@ -112,7 +112,7 @@ class RoboticArm:
     pos_delta = (to_pos[2] - self.vertical_servo.get_current_pos(),
                  to_pos[3] - self.horizontal_servo.get_current_pos(),
                  to_pos[4] - self.level_servo.get_current_pos())
-    max_delta = max(pos_delta)
+    max_delta = max(abs(pos_delta[0]), abs(pos_delta[1]), abs(pos_delta[2]))
     for i in range(1, max_delta + 1):
       # Update each servo proportionally
       update = [(float(i)/max_delta) * x for x in pos_delta]
@@ -160,7 +160,7 @@ class RoboticArm:
   def move_to_base(self):  
     self.base_servo.move_to(servo_base_pos[1])
     self.execute_move_claw_xz(servo_base_pos)
-    self.rail.move_to(servo_base_pos[0]
+    self.rail.move_to(servo_base_pos[0])
     None
     
   # API method exposed by the RoboticArm
@@ -168,11 +168,18 @@ class RoboticArm:
     # Init
     self.straighten_tipping_servo()
     self.claw_release()
-
     # Move and position around cup and grasp it
     self.move_to_cup(is_small_cup, cup_num)
     self.claw_grasp()
     self.move_to_utensil(utensil_size)
     self.pour()
     self.move_to_base()
-    
+
+if (__name__ == "__main__"):
+  arm = RoboticArm(2, 3, 4, 5, 6, 7, 8, 9)
+  arm.move_to_base()
+  arm.add_cup(True, 1, 0)
+  arm.add_cup(True, 2, 0)
+  arm.add_cup(True, 3, 0)
+  arm.add_cup(True, 4, 0)
+  arm.add_cup(True, 5, 0)
