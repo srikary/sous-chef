@@ -96,21 +96,24 @@ class Stirrer:
 
     self.execute_stir_stroke((start_x, start_y), (start_x, end_y))
 
+  def get_curr_time_in_secs():
+    return time.mktime(time.localtime())
+  
   # X axis is the top rail and increases left to right (looking FROM ATX)
   # Y axis is the bottom rail and increases from ATX to front.
   def stir(self, utensil_utensil_index, stir_for_seconds):
     utensil_radius = utensil_diameter_mm[utensil_index]/2
     stir_dx = -10
     top_to_bottom = True
-    start = time.get_time() # Find the right api
+    start = get_curr_time_in_secs()
     while True:
-      current = time.get_time()
+      current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
       for dist_from_center in range((utensil_radius - stir_start_gap), -utensil_radius, stir_dx):
         self.one_stir_stroke(dist_from_center, utensil_index, top_to_bottom)
         top_to_bottom = not top_to_bottom
-        current = time.get_time()
+        current = get_curr_time_in_secs()
         if (current  - start_time) > stir_for_seconds:
           break
     
