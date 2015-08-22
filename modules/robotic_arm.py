@@ -50,6 +50,7 @@ class RoboticArm:
     self.level_servo = servo.Servo(level_servo_pin)
     self.tipping_servo = servo.Servo(tipping_servo_pin)
     self.grasp_servo = servo.Servo(grasp_servo_pin)
+    self.move_to_base()
     
     # TODO : Fill in values to the constructor below.
     self.rail = stepper_axis.StepperAxis(rail_dir_pin, rail_step_pin, max_rail_translation_mm)
@@ -74,6 +75,7 @@ class RoboticArm:
 
 # Begin unfinished methods 
   def move_rail_rotate_base(self, dest_pos):
+    self.at_base = False
     self.rail.move_to(max(0, min(max_rail_translation_mm, dest_pos[1])))
     curr_y_pos = self.rail.get_curr_pos_mm()
     # Need to rotate base servo to point from (0,curr_pos[1]) to (dest_pos[0],dest_pos[1])
@@ -120,6 +122,7 @@ class RoboticArm:
       self.vertical_servo.move_to(new_pos[0])
       self.horizontal_servo.move_to(new_pos[1])
       self.level_servo.move_to(new_pos[2])
+    self.at_base = False
     None
     
   def move_to(self, dest_pos):
@@ -144,12 +147,14 @@ class RoboticArm:
     self.rail.move_to(pos_for_cup[0])
     self.base_servo.move_to(pos_for_cup[1])
     self.execute_move_claw_xz(pos_for_cup)
+    self.at_base = False
     None
 
   def move_to_utensil(self, utensil_size):
     if utensil_size < 0 || utensil_size > 2:
       raise ValueError("Invalid utensil size:" + utensil_size)
-      
+
+    self.at_base = False
     # Positions of the various servos.
     desired_servo_pos = utensil_positions_size[utensil_size]
     self.execute_move_claw_xz(desired_servo_pos)
@@ -161,8 +166,12 @@ class RoboticArm:
     self.base_servo.move_to(servo_base_pos[1])
     self.execute_move_claw_xz(servo_base_pos)
     self.rail.move_to(servo_base_pos[0])
+    self.at_base = True
     None
-    
+
+  def is_at_base(self):
+    return self.at_base
+
   # API method exposed by the RoboticArm
   def add_cup(self, is_small_cup, cup_num, utensil_size):
     # Init
@@ -175,6 +184,9 @@ class RoboticArm:
     self.pour()
     self.move_to_base()
 
+  def shutdown(self):
+    self.move_to_base()
+    
 if (__name__ == "__main__"):
   arm = RoboticArm(2, 3, 4, 5, 6, 7, 8, 9)
   arm.move_to_base()

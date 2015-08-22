@@ -1,5 +1,5 @@
-import modules.stepper_axis as stepper_axis
-
+import modules.submodules.stepper_axis as stepper_axis
+from enum import Enum
 import math
 import time
 
@@ -11,8 +11,11 @@ class Stirrer:
 
   stirrer_z_up_pos = 0.0
   stirrer_z_down_pos = 120.0
-  stirrer_x_utensil_pos = 100.0
-  stirrer_y_utensil_pos = 100.0
+  stirrer_x_utensil_pos = 50.0
+  stirrer_y_utensil_pos = 50.0
+
+  stirrer_x_lid_utensil_pos = 100.0
+  stirrer_y_lid_utensil_pos = 100.0
 
   stirrer_x_home_pos = 0.0
   stirrer_y_home_pos = 0.0
@@ -22,34 +25,51 @@ class Stirrer:
   stir_start_gap = 5.0
   stir_stop_gap = 10.0
 
+  class PlatformPosition(Enum):
+    BASE = 1
+    UTENSIL = 2
+    LID = 3
+    
   # Diameters of the three different all-clad utensils
   utensil_diameter_mm = [270.0, 300.0, 150.0]
   
   def __init__(self,
                x_rail_dir_pin, x_rail_step_pin,
                y_rail_dir_pin, y_rail_step_pin,
-               z_rail_dir_pin, z_rail_step_pin):s   
+               z_rail_dir_pin, z_rail_step_pin):
     # TODO : Fill in values to the constructor below.
     self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin, max_x_rail_translation_mm)
     self.y_rail = stepper_axis.StepperAxis(y_rail_dir_pin, y_rail_step_pin, max_y_rail_translation_mm)
     self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin, max_z_rail_translation_mm)
-
+    self.platform_position = PlatformPosition.BASE
+    
   def stirrer_up(self):
     self.z_rail.move_to(stirrer_z_up_pos)
 
   def stirrer_down(self):
     self.z_rail.move_to(stirrer_z_down_pos)
 
-  def stirrer_position_over_utensil(self):
+  def is_stirrer_up(self):
+    return self.z_rail.get_curr_pos_mm == stirrer_z_up_pos
+ 
+  def position_platform_at_utensil(self):
     self.stirrer_up()
     self.x_rail.move_to(stirrer_x_utensil_pos)
     self.y_rail.move_to(stirrer_y_utensil_pos)
-
-  def stirrer_goto_base(self):
+    self.platform_position = PlatformPosition.UTENSIL
+    
+  def position_platform_at_base(self):
     self.stirrer_up()
     self.x_rail.move_to(stirrer_x_home_pos)
     self.y_rail.move_to(stirrer_y_home_pos)
-
+    self.platform_position = PlatformPosition.UTENSIL
+    
+  def position_platform_at_lid(self):
+    self.stirrer_up()
+    self.x_rail.move_to(stirrer_x_lid_utensil_pos)
+    self.y_rail.move_to(stirrer_y_lid_utensil_pos)
+    self.platform_position = PlatformPosition.LID
+    
   def get_cord_length_mm(dist_from_center, utensil_index):
     if utensil_index >= 3:
       raise ValueError("There are only three known utensil sizes. Invalid utensil index:" + utensil_index)
@@ -96,12 +116,21 @@ class Stirrer:
 
     self.execute_stir_stroke((start_x, start_y), (start_x, end_y))
 
+  def is_platform_at_base(self):
+    return self.platform_position == PlatformPosition.BASE
+
+  def is_platform_at_utensil(self):
+    return self.platform_position == PlatformPosition.UTENSIL
+
+  def is_platform_at_lid(self):
+    return self.platform_position == PlatformPosition.LID
+  
   def get_curr_time_in_secs():
     return time.mktime(time.localtime())
   
   # X axis is the top rail and increases left to right (looking FROM ATX)
   # Y axis is the bottom rail and increases from ATX to front.
-  def stir(self, utensil_utensil_index, stir_for_seconds):
+  def stir(self, utensil_index, stir_for_seconds):
     utensil_radius = utensil_diameter_mm[utensil_index]/2
     stir_dx = -10
     top_to_bottom = True
@@ -116,10 +145,11 @@ class Stirrer:
         current = get_curr_time_in_secs()
         if (current  - start_time) > stir_for_seconds:
           break
+  def shutdown(self):
+    self.position_platform_at_base()
     
 if (__name__ == "__main__"):
   stirrer = Stirrer(2, 3, 4, 5, 6, 7)
-
-  stirrer.stirrer_position_over_utensil()
+  stirrer.position_platform_at_utensil()
   stirrer.stirrer_goto_base()
   stirrer.stir(0, 100)

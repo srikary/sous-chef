@@ -26,6 +26,9 @@ class Pump:
     GPIO.output(self.switch_bcm_pin, GPIO.HIGH)
     self.is_open = True
 
+  def is_open(self):
+    return self.is_open
+
   def close(self):
     GPIO.output(self.switch_bcm_pin, GPIO.LOW)
     self.is_open = False
@@ -51,6 +54,9 @@ class Pump:
   def dispense_tbsp(self, num_tbsps):
     volume_ml = num_tbsps * ml_per_tbsp_
     dispense_ml(volume_ml)
+
+  def shutdown(self):
+    self.close()
     
 if (__name__ == "__main__"):
   pump = Pump(2, 1000, 2000)

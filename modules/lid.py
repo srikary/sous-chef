@@ -11,13 +11,22 @@ class Lid:
         init_pos: A number between 0 and 180 that specifies the initial angle
     """
     self.lid_servo = servo.Servo(lid_servo_bcm_pin, open_pos)
+    self.is_open = True
     
   def open(self):
     self.lid_servo.move_to(open_pos)
+    self.is_open = True
     
   def close(self):
     self.lid_servo.move_to(close_pos)
-          
+    self.is_open = False
+
+  def is_open(self):
+    return self.is_open
+
+  def shutdown(self):
+    self.open()
+    
 if (__name__ == "__main__"):
   lid = Lid(2)
   lid.close()
