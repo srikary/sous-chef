@@ -2,6 +2,7 @@ import cmd
 import datetime
 import os
 import string
+import thread
 import time
 
 import controller.sous_chef.SousChef
@@ -97,7 +98,7 @@ class MakeRecipeCommand(cmd.Cmd):
       num_cups = float(line)
       self.add_time_step_to_recipe()
       self.recipe.add_step(Step("addwater",[num_cups]))
-      self.sous_chef.add_water_in_cups(num_cups)
+      thread.add_new_thread(self.sous_chef.add_water_in_cups, [num_cups])
     except Exception, e:
       print "Error:" + str(e)
 
@@ -111,7 +112,7 @@ class MakeRecipeCommand(cmd.Cmd):
       num_tbsp = float(line)
       self.add_time_step_to_recipe()
       self.recipe.add_step(Step("addoil",[num_tbsp]))
-      self.sous_chef.add_oil_in_tbsp(num_tbsp)
+      thread.add_new_thread(self.sous_chef.add_oil_in_tbsp, [num_tbsp])
     except Exception, e:
       print "Error:" + str(e)
 
