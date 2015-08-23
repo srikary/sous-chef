@@ -4,7 +4,7 @@ import threading
 import time
 
 def get_curr_time_in_secs():
-    return time.mktime(time.localtime())
+  return time.mktime(time.localtime())
 
 bound = lambda x, lower, upper: max(lower, min(upper, x))
 
