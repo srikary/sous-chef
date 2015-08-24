@@ -6,34 +6,28 @@ import time
 
 class RoboticArm:
   # Dimensions of the Arm
-    vertical_offset_mm = 50
-    vertical_arm_mm = 100
-    horizontal_arm_mm = 100
-    level_arm_len= 20
-    claw_offset_to_center = 10
+  vertical_offset_mm = 50
+  vertical_arm_mm = 100
+  horizontal_arm_mm = 100
+  level_arm_len= 20
+  claw_offset_to_center = 10
 
-    small_cup_positions = [(100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),]
+  small_cup_positions = [(100, 0, 30, 30, 30), (100, 0, 30, 30, 30),
+                         (100, 0, 30, 30, 30), (100, 0, 30, 30, 30),
+                         (100, 0, 30, 30, 30), (100, 0, 30, 30, 30)]
 
-    large_cup_positions = [(100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),
-                           (100, 0, 30, 30, 30),]
+  large_cup_positions = [(100, 0, 30, 30, 30), (100, 0, 30, 30, 30),
+                        (100, 0, 30, 30, 30), (100, 0, 30, 30, 30),
+                        (100, 0, 30, 30, 30), (100, 0, 30, 30, 30)]
 
-    # Positions of the cooking utensils by size.
-    # Increasing index of size implies increasing diameter.
-    utensil_positions_size = [(100, 180, 30, 30, 30),
-                              (100, 180, 30, 30, 30),
-                              (100, 180, 30, 30, 30)]
+  # Positions of the cooking utensils by size.
+  # Increasing index of size implies increasing diameter.
+  utensil_positions_size = [(100, 180, 30, 30, 30),
+                           (100, 180, 30, 30, 30),
+                           (100, 180, 30, 30, 30)]
     
 
-    servo_base_pos = (100, 0, 30, 30, 30)
+  servo_base_pos = (100, 0, 30, 30, 30)
                       
   # Dimensions of the Rail
   max_rail_translation_mm = 100
@@ -82,7 +76,7 @@ class RoboticArm:
     # degrees to rotate clockwise with 0 pointing along x axis towards containers
     degrees = math.degrees(math.atan(float(curr_y_pos - dest_pos[1])
                                      /float(0 - dest_pos[0])))
-    if (degrees < 0 || degrees > 180):
+    if (degrees < 0 or degrees > 180):
        raise ValueError("Invalid rotation angle:" +
                         str(degrees) + " degrees. Current position: "
                         + curr_y_pos + "Dest position: " + dest_pos)
@@ -132,16 +126,16 @@ class RoboticArm:
     
   def move_to_cup(self, is_small_cup, cup_num):
     if is_small_cup:
-      if cup_num < 0 || cup_num > 6:
+      if cup_num < 0 or cup_num > 6:
         raise ValueError("Invalid small cup number:" + cup_num)
     else:
-      if cup_num < 0 || cup_num > 5:
+      if cup_num < 0 or cup_num > 5:
         raise ValueError("Invalid large cup number:" + cup_num)
       
     # Positions of the various servos.
     if is_small_cup:
       pos_for_cup = small_cup_positions[cup_num]
-    else
+    else:
       pos_for_cup = large_cup_positions[cup_num]
 
     self.rail.move_to(pos_for_cup[0])
@@ -151,7 +145,7 @@ class RoboticArm:
     None
 
   def move_to_utensil(self, utensil_size):
-    if utensil_size < 0 || utensil_size > 2:
+    if utensil_size < 0 or utensil_size > 2:
       raise ValueError("Invalid utensil size:" + utensil_size)
 
     self.at_base = False

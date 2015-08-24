@@ -14,7 +14,7 @@ import time
 # sudo python examples/simpletest.py
 import Adafruit_TMP.TMP006 as TMP006
     
-StoveController:
+class StoveController:
   """ Interface to the Stove/HotPlate."""
   high_pos = 0
   low_pos = 180
@@ -75,7 +75,7 @@ StoveController:
 
 if (__name__ == "__main__"):
   controller = StoveConroller(2, 3)
-  print "Before" controller.get_temperature()
+  print "Before" + controller.get_temperature()
   controller.set_temperature_C(60)
-  print "After" controller.get_temperature_C()
+  print "After" + controller.get_temperature_C()
   controller.off()

@@ -10,9 +10,10 @@ class StepperAxis:
     self.max_translation_mm = max_translation_mm
     self.rotations_per_mm = rotations_per_mm  # TODO: Set this right.
 
+  # Private methods
   def increment_pos_by_mm(self, distance_in_mm):
     if distance_in_mm < 0:
-      throw up # TODO: Throw an exception
+      raise ValueError("Invalid increment. Has to be positive:" + str(distance_in_mm))
     num_rotations = distance_in_mm * self.rotations_per_mm
     if self.inc_clockwise:
       stepper.rotate_clockwise(num_rotations)
@@ -21,16 +22,19 @@ class StepperAxis:
 
   def decrement_pos_by_mm(self, distance_in_mm):
     if distance_in_mm < 0:
-      throw up # TODO: Throw an exception
+      raise ValueError("Invalid decrement. Has to be positive:" + str(distance_in_mm))
     num_rotations = distance_in_mm * self.rotations_per_mm
     if self.inc_clockwise:
       stepper.rotate_anticlockwise(num_rotations)
     else:
       stepper.rotate_clockwise(num_rotations)
-      
+
+  # End private methods
+  
   def move_to(self, new_pos_mm):
-    if new_pos_mm > max_translation_mm:
-      throw up # TODO: throw an exception
+    if new_pos_mm > max_translation_mm or new_pos_mm < 0:
+      raise ValueError("Invalid value for new_pos_mm. Has to be within " +
+                       " range(0," +str(max_translation_mm) + ")")
     if new_pos_mm > self.curr_pos_mm:
       self.increment_pos_by_mm(new_pos_mm - self.curr_pos_mm)
     else:

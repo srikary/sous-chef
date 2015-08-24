@@ -74,9 +74,7 @@ class PIDController(threading.Thread):
     self.integral = self.integral + self.get_error()
     point = self.savitzky_golay_filter.get_current_smoothed_point()
     derivative = self.savitzky_golay_filter.get_current_smoothed_derivative()
-    new_value = (self.P * point) +
-                (self.I * self.integral * self.sampling_interval_s) +
-                (self.D * derivative)
+    new_value = (self.P * point) + (self.I * self.integral * self.sampling_interval_s) + (self.D * derivative)
     if new_value < 0 or new_value > 100:
       new_value = max(0, min(new_value, 100))
       self.integral = (new_value -(self.P * point) - (self.D * derivative))/(selfI * self.sampling_interval_s)

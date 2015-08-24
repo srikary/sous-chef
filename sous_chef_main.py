@@ -72,7 +72,7 @@ class MakeRecipeCommand(cmd.Cmd):
   def help_lid(self):
     print """Command to open or close the lid. Invoke only when this operation is possible. e.g.
           Robotic Arm is out of the way, pumps are off, stirrer is up.
-          Usage: lid {open,close} """"
+          Usage: lid {open,close} """
     
   def do_lid(self, line):
     cmd = line.strip().lower()
@@ -91,7 +91,7 @@ class MakeRecipeCommand(cmd.Cmd):
   def help_lid(self):
     print """Command to open or close the lid. Invoke only when this operation is possible. e.g.
           Robotic Arm is out of the way, pumps are off, stirrer is up.
-          Usage: lid {open,close} """"
+          Usage: lid {open,close} """
 
   def do_addwater(self, line):
     try:

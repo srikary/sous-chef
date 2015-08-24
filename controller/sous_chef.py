@@ -6,7 +6,7 @@ import modules.stove_controller
 import ConfigParser
 
 class SousChef:
-  def __init__(conf_file="sous-chef.conf", utensil_index):
+  def __init__(utensil_index, conf_file="config/sous-chef.conf"):
     self.utensil_index = utensil_index
     config = ConfigParser.RawConfigParser()
     config.read(conf_file)

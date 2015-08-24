@@ -90,9 +90,9 @@ class SavitzkyGolayFilter(threading.Thread):
     return val
   
   def get_current_smoothed_point(self):
-  """ Will only smooth if there are more than num_points_used_to_fit points
+    """ Will only smooth if there are more than num_points_used_to_fit points
       sampled already.
-  """
+    """
     lock.acquire()
     smoothed_value = 0.0
     if len(self.points) >= self.num_points_used_to_fit:
@@ -110,9 +110,9 @@ class SavitzkyGolayFilter(threading.Thread):
     return smoothed_value
 
   def get_current_smoothed_derivative(self):
-  """ Will only smooth if there are more than num_points_used_to_fit points
-      sampled already.
-  """
+    """ Will only smooth if there are more than num_points_used_to_fit points
+        sampled already.
+    """
     lock.acquire()
     smoothed_value = 0.0
     if len(self.points) >= self.num_points_used_to_fit:
