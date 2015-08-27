@@ -12,6 +12,7 @@ class StepperMotor:
     self.direction_pin = dir_pin
     self.step_pin = step_pin
     GPIO.setup(self.direction_pin, GPIO.OUT)
+    GPIO.output(self.direction_pin, GPIO.LOW)
     GPIO.setup(self.step_pin, GPIO.OUT)
     GPIO.output(self.step_pin, GPIO.LOW)
     self.delay_per_step = self.get_step_delay_from_speed(speed)
@@ -56,14 +57,26 @@ class StepperMotor:
     self.rotate(False, num_rotations)
 
 if (__name__ == "__main__"):
-  step_pins = [10]
-  dir_pins = [9]
-  for i in range(0, len(step_pins)):
-    stepper = StepperMotor(step_pins[i], dir_pins[i], 60)
-    stepper.rotate_clockwise(3)
-    stepper.rotate_anticlockwise(3)
-    stepper.rotate_clockwise(3)
-    stepper.set_speed(120)
-    stepper.rotate_clockwise(3)
-    stepper.rotate_anticlockwise(3)
-    stepper.rotate_clockwise(3)
+  y_stepper = StepperMotor(6, 5, 60)
+  x_stepper = StepperMotor(9, 10, 60)
+  z_stepper = StepperMotor(7, 8, 60)
+  r_stepper = StepperMotor(11, 25, 60)
+  while True:
+    inp = raw_input("-->")
+    vals = inp.split()
+    if len(vals)!=2:
+      raise ValueError("invalid number of arguments")
+    motor_num = int(vals[0])
+    rotations = int(vals[1])
+    direction = True
+    if rotations < 0:
+      direction = False
+      rotations = abs(rotations)
+    if motor_num == 1:
+      y_stepper.rotate_at_speed(60, direction, rotations)
+    elif motor_num == 2:
+      x_stepper.rotate_at_speed(60, direction, rotations)
+    elif motor_num == 2:
+      z_stepper.rotate_at_speed(60, direction, rotations)
+    else:
+      r_stepper.rotate_at_speed(60, direction, rotations)
