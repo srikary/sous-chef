@@ -1,10 +1,13 @@
 import RPi.GPIO as GPIO
 import time
 
+def get_dutycycle_for_angle(angle):
+  return float(angle) / 9 + 5 # (float(angle)/180 + 1) * 5
+
 class Servo:
   """ Wrapper interface to a Servo."""
-  
-  def __init__(self, bcm_pin, init_pos=0, move_delay_ms=0.01):
+
+  def __init__(self, bcm_pin, init_pos=0, move_delay=0.01):
     """
         bcm_pin: Provide the pin (BCM numbering) that the Servo is connected to.
         init_pos: A number between 0 and 180 that specifies the initial angle
@@ -17,15 +20,12 @@ class Servo:
     self.curr_pos = init_pos
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(bcm_pin, GPIO.OUT)
-    self.pwm = GPIO.PWM(self.bcm_pin, 100)
+    self.pwm = GPIO.PWM(bcm_pin, 100)
     self.pwm.start(get_dutycycle_for_angle(init_pos))
 
-  def get_dutycycle_for_angle(angle):
-    return float(angle) / 36 + 5 # (float(angle)/180 + 1) * 5
-  
-  def set_angle(angle):
+  def set_angle(self, angle):
     duty = get_dutycycle_for_angle(angle)
-    pwm.ChangeDutyCycle(duty)
+    self.pwm.ChangeDutyCycle(duty)
 
   def move_to(self, dest_angle):
     if (dest_angle< 0 or dest_angle > 180):
@@ -33,18 +33,25 @@ class Servo:
     direction = 1
     if (dest_angle < self.curr_pos):
       direction = -1
-    for angle in range(self.curr_pos, dest_pos, direction):
+    for angle in range(self.curr_pos, dest_angle, direction):
       self.curr_pos = angle
-      set_angle(self.curr_pos)
+      self.set_angle(self.curr_pos)
       time.sleep(self.move_delay)
 
   def get_current_pos(self):
     return self.curr_pos
-          
+
 if (__name__ == "__main__"):
-  servo_pins = []
-  for pin in servo_pins:
-    servo = Servo(pin, 30)
-    servo.move_to(50)
-    servo.move_to(30)
-    
+  # servo_pins = [22]
+  # for pin in servo_pins:
+  #  servo = Servo(pin, 0)
+  #  servo.move_to(180)
+  #  servo.move_to(0)
+  pin = 22
+  servo = Servo(pin, 0)
+  while True:
+    inp = raw_input("-->")
+    pos = int(inp)
+    print pos
+    servo.move_to(pos)
+
