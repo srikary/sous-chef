@@ -56,10 +56,10 @@ class StepperMotor:
     self.rotate(False, num_rotations)
 
 if (__name__ == "__main__"):
-  step_pins = [10]
-  dir_pins = [9]
+  step_pins = [25]
+  dir_pins = [11]
   for i in range(0, len(step_pins)):
-    stepper = StepperMotor(step_pins[i], dir_pins[i], 60)
+    stepper = StepperMotor(dir_pins[i], step_pins[i], 60)
     stepper.rotate_clockwise(3)
     stepper.rotate_anticlockwise(3)
     stepper.rotate_clockwise(3)
