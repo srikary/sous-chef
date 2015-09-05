@@ -54,7 +54,7 @@ class SavitzkyGolayFilter(threading.Thread):
         self.points.append(point)
         if len(self.points) > self.num_points_used_to_fit:
           self.points.popleft()
-        # print self.points
+        print self.points
       elif self.should_stop:
         self.lock.release()
         return # Stopping condition. Exits thread
@@ -82,12 +82,10 @@ class SavitzkyGolayFilter(threading.Thread):
     self.lock.release()
     
   def get_last_raw_point(self):
-    self.lock.acquire()
     if len(self.points) == 0:
       val = None
     else:
       val = self.points[len(self.points) - 1]
-    self.lock.release()
     return val
   
   def get_current_smoothed_point(self):
@@ -105,22 +103,19 @@ class SavitzkyGolayFilter(threading.Thread):
       for i in range(0, self.num_points_used_to_fit):
         smoothed_value = smoothed_value + convolution_filter[i]*self.points[i]
       smoothed_value = float(smoothed_value)/float(normalization_factor)
-      self.lock.release()
     else:
-      self.lock.release()
       smoothed_value = self.get_last_raw_point()
 
+    self.lock.release()
     return smoothed_value
 
   def get_raw_derivative(self):
-    self.lock.acquire()
     if len(self.points) < 2:
       val = None
     else:
       last_idx = len(self.points) - 1
       dy = self.points[last_idx] - self.points[last_idx - 1]
       val = float(dy)/self.sampling_interval
-      self.lock.release()
     return val
 
   def get_current_smoothed_derivative(self):
@@ -138,10 +133,10 @@ class SavitzkyGolayFilter(threading.Thread):
       for i in range(0, self.num_points_used_to_fit):
         smoothed_value = smoothed_value + convolution_filter[i]*self.points[i]
       smoothed_value = float(smoothed_value)/float(normalization_factor * self.sampling_interval)
-      self.lock.release()
     else:
-      self.lock.release()
       smoothed_value = self.get_raw_derivative()
+      
+    self.lock.release()
     return smoothed_value
 
 

@@ -40,9 +40,12 @@ class PIDController(threading.Thread):
                                      num_points_used_to_fit = 5)
     self.is_enabled = False
     self.should_stop = False
+    self.lock = threading.Lock()
 
   def get_error(self):
-    return (self.setpoint - self.get_current_process_variable())
+    dest_point = self.setpoint
+    return (dest_point - self.get_current_process_variable())
+    
   
   def run(self):
     self.is_enabled = False
@@ -52,33 +55,40 @@ class PIDController(threading.Thread):
     while True:
       print "A"
       start_time = get_curr_time_in_secs()
-      # This needs to be locked. But, the consequences are not high enough to
-      # justify introducing the lock.
+      self.lock.acquire()
+      print self.is_enabled
       if self.is_enabled:
-        print "B"
         new_manipulated_variable = self.compute_manipulated_variable()
+        print "New Dest:" + str(new_manipulated_variable)
         if new_manipulated_variable is not None:
           print "C"
           self.set_manipulated_variable(new_manipulated_variable)
       elif self.should_stop:
+        self.lock.release()
         return # Stopping condition. Exits thread
+      self.lock.release()
       new_time = get_curr_time_in_secs()
       if (new_time - start_time) < self.sampling_interval_s:
         time_to_sleep = start_time + self.sampling_interval_s - new_time
         time.sleep(time_to_sleep)
 
   def stop(self):
+    self.lock.acquire()
     self.savitzky_golay_filter.stop()
     self.savitzky_golay_filter.join()
     self.is_enabled = False
     self.should_stop = True
+    self.lock.release()
     
   def compute_manipulated_variable(self):
-    self.integral = self.integral + self.get_error()
+    print "P"
     point = self.savitzky_golay_filter.get_current_smoothed_point()
+    print "Q"
     derivative = self.savitzky_golay_filter.get_current_smoothed_derivative()
+    print "R"
     if point == None or derivative == None:
       return None
+    self.integral = self.integral + point
     new_value = (self.P * point) + (self.I * self.integral * self.sampling_interval_s) + (self.D * derivative)
     if new_value < 0 or new_value > 100:
       new_value = max(0, min(new_value, 100))
@@ -86,13 +96,17 @@ class PIDController(threading.Thread):
     return new_value
   
   def pause(self):
+    self.lock.acquire()
     self.is_enabled = False
     self.savitzky_golay_filter.pause()
     self.integral = 0.0
+    self.lock.release()
 
   def resume(self):
+    self.lock.acquire()
     self.savitzky_golay_filter.resume()
     self.is_enabled = True
+    self.lock.release()
     
   def set_new_setpoint(self, new_setpoint):
     self.pause()
@@ -127,7 +141,7 @@ class MockStove:
   
 if (__name__ == "__main__"):
   mock_stove = MockStove(30)
-  pid = PIDController(1, 1, 0, # P, I, D
+  pid = PIDController(1.0, 1.0, 0, # P, I, D
                       40,      # setpoint
                       2,       # sampling interval   
                       mock_stove.get_temp,
