@@ -112,6 +112,17 @@ class SavitzkyGolayFilter(threading.Thread):
 
     return smoothed_value
 
+  def get_raw_derivative(self):
+    self.lock.acquire()
+    if len(self.points) < 2:
+      val = None
+    else:
+      last_idx = len(self.points) - 1
+      dy = self.points[last_idx] - self.points[last_idx - 1]
+      val = float(dy)/self.sampling_interval
+      self.lock.release()
+    return val
+
   def get_current_smoothed_derivative(self):
     """ Will only smooth if there are more than num_points_used_to_fit points
         sampled already.
@@ -130,7 +141,7 @@ class SavitzkyGolayFilter(threading.Thread):
       self.lock.release()
     else:
       self.lock.release()
-      smoothed_value = 0.0
+      smoothed_value = self.get_raw_derivative()
     return smoothed_value
 
 

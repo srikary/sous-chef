@@ -1,12 +1,10 @@
-import modules.submodules.savitzky_golay_filter
+import savitzky_golay_filter
 import random
 import threading
 import time
 
 def get_curr_time_in_secs():
   return time.mktime(time.localtime())
-
-bound = lambda x, lower, upper: max(lower, min(upper, x))
 
 class PIDController(threading.Thread):
   """ Implementation of a PID Controller to control the value of a
@@ -27,6 +25,7 @@ class PIDController(threading.Thread):
                                   and 100 that is linearly interpreted by the
                                   function to set the manipulated variable.
     """
+    threading.Thread.__init__(self)
     self.P = P
     self.I = I
     self.D = D
@@ -38,7 +37,7 @@ class PIDController(threading.Thread):
     self.savitzky_golay_filter = savitzky_golay_filter.SavitzkyGolayFilter(
                                      self.sampling_interval_s,
                                      self.get_error,
-                                     num_points_used = 5)
+                                     num_points_used_to_fit = 5)
     self.is_enabled = False
     self.should_stop = False
 
@@ -51,17 +50,21 @@ class PIDController(threading.Thread):
     # Randomize the start of the filter and the current thread.
     time.sleep(random.randint(0, self.sampling_interval_s/2))
     while True:
-      current_time = get_curr_time_in_secs()
+      print "A"
+      start_time = get_curr_time_in_secs()
       # This needs to be locked. But, the consequences are not high enough to
       # justify introducing the lock.
       if self.is_enabled:
+        print "B"
         new_manipulated_variable = self.compute_manipulated_variable()
-        sef.set_manipulated_variable(new_manipulated_variable)
+        if new_manipulated_variable is not None:
+          print "C"
+          self.set_manipulated_variable(new_manipulated_variable)
       elif self.should_stop:
         return # Stopping condition. Exits thread
       new_time = get_curr_time_in_secs()
-      if (new_time - current_time) < self.sampling_interval_s:
-        time_to_sleep = current_time + self.sampling_interval_s - new_time
+      if (new_time - start_time) < self.sampling_interval_s:
+        time_to_sleep = start_time + self.sampling_interval_s - new_time
         time.sleep(time_to_sleep)
 
   def stop(self):
@@ -74,6 +77,8 @@ class PIDController(threading.Thread):
     self.integral = self.integral + self.get_error()
     point = self.savitzky_golay_filter.get_current_smoothed_point()
     derivative = self.savitzky_golay_filter.get_current_smoothed_derivative()
+    if point == None or derivative == None:
+      return None
     new_value = (self.P * point) + (self.I * self.integral * self.sampling_interval_s) + (self.D * derivative)
     if new_value < 0 or new_value > 100:
       new_value = max(0, min(new_value, 100))
@@ -89,8 +94,52 @@ class PIDController(threading.Thread):
     self.savitzky_golay_filter.resume()
     self.is_enabled = True
     
-    
   def set_new_setpoint(self, new_setpoint):
     self.pause()
     self.setpoint = new_setpoint
     self.resume()
+
+# Unit test helpers and methods.
+class MockStove:
+  def __init__(self, start_temp):
+    self.deg_per_sec = 0.5
+    self.curr_temp = start_temp
+    self.last_update_time = get_curr_time_in_secs()
+    self.dest_temp = start_temp
+    
+  def get_temp(self):
+    time_curr = get_curr_time_in_secs()
+    if self.curr_temp == self.dest_temp:
+      self.last_update_time = time_curr
+      return self.curr_temp
+    
+    degrees = self.deg_per_sec * (time_curr - self.last_update_time)
+    new_temp = self.curr_temp + degrees
+    if self.curr_temp > self.dest_temp:
+      new_temp = self.curr_temp - degrees
+    self.last_update_time = time_curr
+    self.curr_tempm = new_temp
+    return new_temp
+
+  def set_temp(self, temp):
+    self.dest_temp = temp
+    print "Set temp to: " + str(temp)
+  
+if (__name__ == "__main__"):
+  mock_stove = MockStove(30)
+  pid = PIDController(1, 1, 0, # P, I, D
+                      40,      # setpoint
+                      2,       # sampling interval   
+                      mock_stove.get_temp,
+                      mock_stove.set_temp) 
+  pid.start()
+  pid.set_new_setpoint(34)
+  time.sleep(10)
+  pid.pause()
+  time.sleep(10)
+  pid.resume()
+  time.sleep(10)
+  pid.set_new_setpoint(37)
+  time.sleep(10)
+  pid.stop()
+  pid.join()
