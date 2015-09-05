@@ -33,6 +33,7 @@ class SavitzkyGolayFilter(threading.Thread):
                         9 : (1188, [-86, 142, 193, 126, 0, -126, -193, -142, 86])}
   
   def __init__(self, sampling_interval, get_next_point, num_points_used_to_fit = 5):
+    threading.Thread.__init__(self)
     self.points = deque([])
     self.sampling_interval = sampling_interval
     self.get_next_point = get_next_point
@@ -40,72 +41,74 @@ class SavitzkyGolayFilter(threading.Thread):
     self.num_points_used_to_fit = num_points_used_to_fit 
     if sampling_interval <= 1:
       raise ValueError("Sampling interval has to be > 1:" + sampling_interval)
-    self.is_enabled = False
+    self.is_enabled = True
     self.should_stop = False
     
   def run(self):
     """ Adds a point every sampling_interval secs. """
-    self.is_enabled = False
     while True:
-      current_time = get_curr_time_in_secs()
-      lock.acquire()
+      start_time = get_curr_time_in_secs()
+      self.lock.acquire()
       if self.is_enabled:
         point = self.get_next_point()
         self.points.append(point)
         if len(self.points) > self.num_points_used_to_fit:
           self.points.popleft()
-        lock.release()
+        # print self.points
       elif self.should_stop:
-        lock.release()
+        self.lock.release()
         return # Stopping condition. Exits thread
+      self.lock.release()
       new_time = get_curr_time_in_secs()
-      if (new_time - current_time) < self.sampling_interval:
-        time_to_sleep = current_time + self.sampling_interval - new_time
+      if (new_time - start_time) < self.sampling_interval:
+        time_to_sleep = start_time + self.sampling_interval - new_time
         time.sleep(time_to_sleep)
 
   def stop(self):
-    lock.acquire()
+    self.lock.acquire()
     self.is_enabled = False
     self.should_stop = True
-    lock.release()
+    self.lock.release()
 
   def pause(self):
-    lock.acquire()
+    self.lock.acquire()
     self.is_enabled = False
     self.points.clear()
-    lock.release()
+    self.lock.release()
 
   def resume(self):
-    lock.acquire()
+    self.lock.acquire()
     self.is_enabled = True
-    lock.release()
+    self.lock.release()
     
   def get_last_raw_point(self):
-    lock.acquire()
+    self.lock.acquire()
     if len(self.points) == 0:
       val = None
     else:
       val = self.points[len(self.points) - 1]
-    lock.release()
+    self.lock.release()
     return val
   
   def get_current_smoothed_point(self):
     """ Will only smooth if there are more than num_points_used_to_fit points
       sampled already.
     """
-    lock.acquire()
+    self.lock.acquire()
     smoothed_value = 0.0
     if len(self.points) >= self.num_points_used_to_fit:
-      convolution_filter = function_convolution_tables[self.num_points_used_to_fit][1]
-      normalization_factor = function_convolution_tables[self.num_points_used_to_fit][0]
+      convolution_filter = SavitzkyGolayFilter.function_convolution_tables[
+        self.num_points_used_to_fit][1]
+      normalization_factor = SavitzkyGolayFilter.function_convolution_tables[
+        self.num_points_used_to_fit][0]
      
       for i in range(0, self.num_points_used_to_fit):
         smoothed_value = smoothed_value + convolution_filter[i]*self.points[i]
       smoothed_value = float(smoothed_value)/float(normalization_factor)
-      lock.release()
+      self.lock.release()
     else:
-      lock.release()
-      smoothed_value = get_last_raw_point()
+      self.lock.release()
+      smoothed_value = self.get_last_raw_point()
 
     return smoothed_value
 
@@ -113,17 +116,41 @@ class SavitzkyGolayFilter(threading.Thread):
     """ Will only smooth if there are more than num_points_used_to_fit points
         sampled already.
     """
-    lock.acquire()
+    self.lock.acquire()
     smoothed_value = 0.0
     if len(self.points) >= self.num_points_used_to_fit:
-      convolution_filter = derivative_convolution_tables[self.num_points_used_to_fit][1]
-      normalization_factor = derivative_convolution_tables[self.num_points_used_to_fit][0]
+      convolution_filter = SavitzkyGolayFilter.derivative_convolution_tables[
+        self.num_points_used_to_fit][1]
+      normalization_factor = SavitzkyGolayFilter.derivative_convolution_tables[
+        self.num_points_used_to_fit][0]
      
       for i in range(0, self.num_points_used_to_fit):
         smoothed_value = smoothed_value + convolution_filter[i]*self.points[i]
       smoothed_value = float(smoothed_value)/float(normalization_factor * self.sampling_interval)
-      lock.release()
+      self.lock.release()
     else:
-      lock.release()
+      self.lock.release()
       smoothed_value = 0.0
     return smoothed_value
+
+
+def get_pt():
+  time_start = (get_curr_time_in_secs() - 1441473133)/2
+  return 4 + time_start * time_start
+
+if (__name__ == "__main__"):
+  filter = SavitzkyGolayFilter(2, get_pt, 5)
+  filter.start()
+  for i in range(0, 10):
+    print "" + str(i) + " " + str(filter.get_current_smoothed_derivative()) +  " k "
+    time.sleep(2)
+  filter.pause()
+  for i in range(0, 5):
+    print "" + str(i) + " " + str(filter.get_current_smoothed_point()) +  " k "
+    time.sleep(2)
+  filter.resume()
+  for i in range(0, 10):
+    print "" + str(i) + " " + str(filter.get_current_smoothed_point()) +  " k "
+    time.sleep(2)
+  filter.stop()
+  filter.join()
