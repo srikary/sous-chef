@@ -1,4 +1,3 @@
-__all__ = ['drivers',
-           'stepper_axis',
+__all__ = ['stepper_axis',
            'pid_controller',
            'savitzky_golay_filter']

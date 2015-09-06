@@ -31,7 +31,7 @@ class StepperMotor:
     else:
       GPIO.output(self.direction_pin, GPIO.LOW)
 
-    num_steps = num_rotations * StepperMotor.steps_per_rotation
+    num_steps = int(num_rotations * StepperMotor.steps_per_rotation)
     for i in range(0, num_steps):
       GPIO.output(self.step_pin, GPIO.HIGH)
       time.sleep(0.001)

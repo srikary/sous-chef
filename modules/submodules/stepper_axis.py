@@ -1,7 +1,7 @@
-import modules.driver.stepper as stepper
+from ..drivers import stepper
 
 class StepperAxis:
-  
+
   """ Represents an axis controlled by a stepper motor """
   def __init__(self, dir_pin, step_pin, max_translation_mm, speed=60,
                inc_clockwise=True, rotations_per_mm = (float(1)/35)):
@@ -17,21 +17,21 @@ class StepperAxis:
       raise ValueError("Invalid increment. Has to be positive:" + str(distance_in_mm))
     num_rotations = distance_in_mm * self.rotations_per_mm
     if self.inc_clockwise:
-      stepper.rotate_clockwise(num_rotations)
+      self.stepper.rotate_clockwise(num_rotations)
     else:
-      stepper.rotate_anticlockwise(num_rotations)
+      self.stepper.rotate_anticlockwise(num_rotations)
 
   def decrement_pos_by_mm(self, distance_in_mm):
     if distance_in_mm < 0:
       raise ValueError("Invalid decrement. Has to be positive:" + str(distance_in_mm))
     num_rotations = distance_in_mm * self.rotations_per_mm
     if self.inc_clockwise:
-      stepper.rotate_anticlockwise(num_rotations)
+      self.stepper.rotate_anticlockwise(num_rotations)
     else:
-      stepper.rotate_clockwise(num_rotations)
+      self.stepper.rotate_clockwise(num_rotations)
 
   # End private methods
-  
+
   def move_to(self, new_pos_mm):
     if new_pos_mm > self.max_translation_mm or new_pos_mm < 0:
       raise ValueError("Invalid value for new_pos_mm. Has to be within " +
@@ -41,7 +41,7 @@ class StepperAxis:
     else:
       self.decrement_pos_by_mm(self.curr_pos_mm - new_pos_mm)
     self.curr_pos_mm = new_pos_mm
-      
+
   def get_curr_pos_mm(self):
     return self.curr_pos_mm
 

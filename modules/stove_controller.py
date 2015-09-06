@@ -1,4 +1,4 @@
-import driver.servo as servo
+import drivers.servo as servo
 import submodules.pid_controller
 import RPi.GPIO as GPIO
 import time
@@ -13,7 +13,7 @@ import time
 # sudo python setup.py install
 # sudo python examples/simpletest.py
 import Adafruit_TMP.TMP006 as TMP006
-    
+
 class StoveController:
   """ Interface to the Stove/HotPlate."""
   high_pos = 0
@@ -21,7 +21,7 @@ class StoveController:
   kP = 0.8 # Set these values appropriately.
   kI = 0.5
   kD = 0.0
-    
+
   def __init__(self, servo_bcm_pin, switch_bcm_pin, sampling_interval_s = 5):
     """
         servo_bcm_pin: Provide the pin (BCM numbering) that the lid Servo
@@ -43,7 +43,7 @@ class StoveController:
                                                             self.get_temperature_C,
                                                             self.set_temperature_from_percentage)
     self.pid_controller.start()
-    
+
   def on(self):
     GPIO.output(self.switch_bcm_pin, GPIO.HIGH)
     self.is_on = True
@@ -61,7 +61,7 @@ class StoveController:
   # Hold the stove at the current setting and pause temperature control.
   def hold_freeze(self):
     self.temp_pid_controller.pause()
-    
+
   def is_on(self):
     return self.is_on
 
@@ -69,11 +69,11 @@ class StoveController:
     target_value = int((float(abs(StoveController.low_pos - StoveController.high_pos)) * percentage)/ 100)
     self.servo.move_to(target_value)
 
-  # Public methods                     
+  # Public methods
   def set_temperature_C(self, temperature):
     self.on()
     self.temp_pid_controller.set_new_setpoint(temperature)
-    
+
   def get_temperature_C(self):
     return self.temp_sensor.readObjTempC()
 
