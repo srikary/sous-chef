@@ -34,7 +34,7 @@ class StepperAxis:
 
   def move_to(self, new_pos_mm):
     if new_pos_mm > self.max_translation_mm or new_pos_mm < 0:
-      raise ValueError("Invalid value for new_pos_mm. Has to be within " +
+        raise ValueError("Invalid value:" + str(new_pos_mm) + " for new_pos_mm. Has to be within " +
                        " range(0," +str(self.max_translation_mm) + ")")
     if new_pos_mm > self.curr_pos_mm:
       self.increment_pos_by_mm(new_pos_mm - self.curr_pos_mm)
@@ -46,10 +46,10 @@ class StepperAxis:
     return self.curr_pos_mm
 
 if (__name__ == "__main__"):
-  y_stepper = StepperAxis(6, 5, 60)
-  x_stepper = StepperAxis(9, 10, 60)
-  z_stepper = StepperAxis(7, 8, 60)
-  r_stepper = StepperAxis(11, 25, 60)
+  r_stepper = StepperAxis(6, 5, 6000, inc_clockwise=False)
+  z_stepper = StepperAxis(9, 10, 6000)
+  x_stepper = StepperAxis(7, 8, 6000, inc_clockwise=False)
+  y_stepper = StepperAxis(11, 25, 6000)
   while True:
     inp = raw_input("-->")
     vals = inp.split()
@@ -58,14 +58,14 @@ if (__name__ == "__main__"):
     motor_num = int(vals[0])
     position = int(vals[1])
     if motor_num == 1:
-      y_stepper.move_to(position)
-      print "Y Currently at: " + str(y_stepper.get_curr_pos_mm())
-    elif motor_num == 2:
-      x_stepper.move_to(position)
-      print "X Currently at: " + str(x_stepper.get_curr_pos_mm())
-    elif motor_num == 3:
-      z_stepper.move_to(position)
-      print "Z Currently at: " + str(z_stepper.get_curr_pos_mm())
-    else:
       r_stepper.move_to(position)
       print "R Currently at: " + str(r_stepper.get_curr_pos_mm())
+    elif motor_num == 2:
+      z_stepper.move_to(position)
+      print "Z Currently at: " + str(z_stepper.get_curr_pos_mm())
+    elif motor_num == 3:
+      x_stepper.move_to(position)
+      print "X Currently at: " + str(x_stepper.get_curr_pos_mm())
+    else:
+      y_stepper.move_to(position)
+      print "Y Currently at: " + str(y_stepper.get_curr_pos_mm())
