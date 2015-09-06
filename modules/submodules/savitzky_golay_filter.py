@@ -54,7 +54,7 @@ class SavitzkyGolayFilter(threading.Thread):
         self.points.append(point)
         if len(self.points) > self.num_points_used_to_fit:
           self.points.popleft()
-        print self.points
+        # print self.points
       elif self.should_stop:
         self.lock.release()
         return # Stopping condition. Exits thread

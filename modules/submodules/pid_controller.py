@@ -53,15 +53,13 @@ class PIDController(threading.Thread):
     # Randomize the start of the filter and the current thread.
     time.sleep(random.randint(0, self.sampling_interval_s/2))
     while True:
-      print "A"
       start_time = get_curr_time_in_secs()
       self.lock.acquire()
-      print self.is_enabled
+      # print self.is_enabled
       if self.is_enabled:
         new_manipulated_variable = self.compute_manipulated_variable()
-        print "New Dest:" + str(new_manipulated_variable)
+        # print "New Dest:" + str(new_manipulated_variable)
         if new_manipulated_variable is not None:
-          print "C"
           self.set_manipulated_variable(new_manipulated_variable)
       elif self.should_stop:
         self.lock.release()
@@ -81,15 +79,12 @@ class PIDController(threading.Thread):
     self.lock.release()
     
   def compute_manipulated_variable(self):
-    print "P"
     point = self.savitzky_golay_filter.get_current_smoothed_point()
-    print "Q"
     derivative = self.savitzky_golay_filter.get_current_smoothed_derivative()
-    print "R"
     if point == None or derivative == None:
       return None 
     self.integral = self.integral + point
-    print "Values Integral: " + str(self.integral) + ", Point: " + str(point) + ", Derivative: " + str(derivative)
+    # print "Values Integral: " + str(self.integral) + ", Point: " + str(point) + ", Derivative: " + str(derivative)
     new_value = (self.P * point) + (self.I * self.integral * self.sampling_interval_s) + (self.D * derivative)
     if new_value < 0 or new_value > 100:
       new_value = max(0, min(new_value, 100))
@@ -134,13 +129,13 @@ class MockStove:
     if self.curr_temp > self.dest_temp:
       new_temp = self.curr_temp - degrees
     self.last_update_time = time_curr
-    print "Time Delta: " + str(time_delta) + ", Curr Temp: " + str(self.curr_temp)+ ", New Temp: " + str(new_temp) 
+    # print "Time Delta: " + str(time_delta) + ", Curr Temp: " + str(self.curr_temp)+ ", New Temp: " + str(new_temp) 
     self.curr_temp = new_temp
     return self.curr_temp
 
   def set_temp(self, temp):
     self.dest_temp = temp
-    print "Set temp to: " + str(temp)
+    # print "Set temp to: " + str(temp)
   
 if (__name__ == "__main__"):
   mock_stove = MockStove(30)

@@ -1,5 +1,5 @@
-import modules.driver.servo as servo
-import modules.submodules.pid_controller
+import driver.servo as servo
+import submodules.pid_controller
 import RPi.GPIO as GPIO
 import time
 
@@ -18,8 +18,8 @@ class StoveController:
   """ Interface to the Stove/HotPlate."""
   high_pos = 0
   low_pos = 180
-  kP = 0.0 # Set these values appropriately.
-  kI = 0.0
+  kP = 0.8 # Set these values appropriately.
+  kI = 0.5
   kD = 0.0
     
   def __init__(self, servo_bcm_pin, switch_bcm_pin, sampling_interval_s = 5):
@@ -28,14 +28,17 @@ class StoveController:
                        is connected to.
         init_pos: A number between 0 and 180 that specifies the initial angle
     """
-    self.servo = servo.Servo(servo_bcm_pin, low_pos)
+    self.servo = servo.Servo(servo_bcm_pin, StoveController.low_pos)
     self.switch_bcm_pin = switch_bcm_pin
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(self.switch_bcm_pin, GPIO.OUT)
     self.off()
     self.temp_sensor = TMP006.TMP006()
     self.temp_sensor.begin()
-    self.temp_pid_controller = pid_controller.PIDController(kP, kI, kD, 0,
+    self.temp_pid_controller = pid_controller.PIDController(StoveController.kP,
+                                                            StoveController.kI,
+                                                            StoveController.kD,
+                                                            20, # setpoint
                                                             sampling_interval_s,
                                                             self.get_temperature_C,
                                                             self.set_temperature_from_percentage)
@@ -63,19 +66,22 @@ class StoveController:
     return self.is_on
 
   def set_temperature_from_percentage(self, percentage):
-    target_value = int((float(abs(low_pos - high_pos)) * percentage)/ 100)
-    servo.move_to(target_value)
-                       
+    target_value = int((float(abs(StoveController.low_pos - StoveController.high_pos)) * percentage)/ 100)
+    self.servo.move_to(target_value)
+
+  # Public methods                     
   def set_temperature_C(self, temperature):
     self.on()
     self.temp_pid_controller.set_new_setpoint(temperature)
     
   def get_temperature_C(self):
-    return temp_sensor.readObjTempC()
+    return self.temp_sensor.readObjTempC()
 
 if (__name__ == "__main__"):
-  controller = StoveConroller(2, 3)
+  controller = StoveConroller(17, 12)
   print "Before" + controller.get_temperature()
   controller.set_temperature_C(60)
-  print "After" + controller.get_temperature_C()
-  controller.off()
+  for i in range(0, 10):
+    print "After" + controller.get_temperature_C()
+    time.sleep(10)
+  controller.shutdown()
