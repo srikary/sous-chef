@@ -1,5 +1,5 @@
 import drivers.servo as servo
-import submodules.pid_controller
+import submodules.pid_controller as pid_controller
 import RPi.GPIO as GPIO
 import time
 
@@ -42,7 +42,7 @@ class StoveController:
                                                             sampling_interval_s,
                                                             self.get_temperature_C,
                                                             self.set_temperature_from_percentage)
-    self.pid_controller.start()
+    self.temp_pid_controller.start()
 
   def on(self):
     GPIO.output(self.switch_bcm_pin, GPIO.HIGH)
@@ -78,10 +78,10 @@ class StoveController:
     return self.temp_sensor.readObjTempC()
 
 if (__name__ == "__main__"):
-  controller = StoveConroller(17, 12)
-  print "Before" + controller.get_temperature()
+  controller = StoveController(17, 12)
+  print "Before" + str(controller.get_temperature_C())
   controller.set_temperature_C(60)
   for i in range(0, 10):
-    print "After" + controller.get_temperature_C()
+    print "After" + str(controller.get_temperature_C())
     time.sleep(10)
   controller.shutdown()
