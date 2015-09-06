@@ -87,12 +87,13 @@ class PIDController(threading.Thread):
     derivative = self.savitzky_golay_filter.get_current_smoothed_derivative()
     print "R"
     if point == None or derivative == None:
-      return None
+      return None 
     self.integral = self.integral + point
+    print "Values Integral: " + str(self.integral) + ", Point: " + str(point) + ", Derivative: " + str(derivative)
     new_value = (self.P * point) + (self.I * self.integral * self.sampling_interval_s) + (self.D * derivative)
     if new_value < 0 or new_value > 100:
       new_value = max(0, min(new_value, 100))
-      self.integral = (new_value -(self.P * point) - (self.D * derivative))/(selfI * self.sampling_interval_s)
+      self.integral = (new_value -(self.P * point) - (self.D * derivative))/(self.I * self.sampling_interval_s)
     return new_value
   
   def pause(self):
@@ -126,14 +127,16 @@ class MockStove:
     if self.curr_temp == self.dest_temp:
       self.last_update_time = time_curr
       return self.curr_temp
-    
-    degrees = self.deg_per_sec * (time_curr - self.last_update_time)
+
+    time_delta = (time_curr - self.last_update_time)
+    degrees = self.deg_per_sec * time_delta
     new_temp = self.curr_temp + degrees
     if self.curr_temp > self.dest_temp:
       new_temp = self.curr_temp - degrees
     self.last_update_time = time_curr
-    self.curr_tempm = new_temp
-    return new_temp
+    print "Time Delta: " + str(time_delta) + ", Curr Temp: " + str(self.curr_temp)+ ", New Temp: " + str(new_temp) 
+    self.curr_temp = new_temp
+    return self.curr_temp
 
   def set_temp(self, temp):
     self.dest_temp = temp
@@ -141,14 +144,14 @@ class MockStove:
   
 if (__name__ == "__main__"):
   mock_stove = MockStove(30)
-  pid = PIDController(1.0, 1.0, 0, # P, I, D
-                      40,      # setpoint
+  pid = PIDController(0.8, 0.5, 0, # P, I, D
+                      34,      # setpoint
                       2,       # sampling interval   
                       mock_stove.get_temp,
                       mock_stove.set_temp) 
   pid.start()
   pid.set_new_setpoint(34)
-  time.sleep(10)
+  time.sleep(30)
   pid.pause()
   time.sleep(10)
   pid.resume()

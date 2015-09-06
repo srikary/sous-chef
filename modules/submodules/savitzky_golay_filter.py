@@ -39,9 +39,9 @@ class SavitzkyGolayFilter(threading.Thread):
     self.get_next_point = get_next_point
     self.lock = threading.Lock()
     self.num_points_used_to_fit = num_points_used_to_fit 
-    if sampling_interval <= 1:
+    if sampling_interval < 1:
       raise ValueError("Sampling interval has to be > 1:" + sampling_interval)
-    self.is_enabled = True
+    self.is_enabled = False
     self.should_stop = False
     
   def run(self):
