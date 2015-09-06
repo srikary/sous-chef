@@ -81,7 +81,7 @@ if (__name__ == "__main__"):
   controller = StoveController(17, 12)
   print "Before" + str(controller.get_temperature_C())
   controller.set_temperature_C(60)
-  for i in range(0, 10):
+  for i in range(0, 100):
     print "After" + str(controller.get_temperature_C())
     time.sleep(10)
   controller.shutdown()

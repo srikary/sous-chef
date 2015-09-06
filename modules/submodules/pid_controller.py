@@ -45,8 +45,8 @@ class PIDController(threading.Thread):
   def get_error(self):
     dest_point = self.setpoint
     return (dest_point - self.get_current_process_variable())
-    
-  
+
+
   def run(self):
     self.is_enabled = False
     self.savitzky_golay_filter.start()
@@ -58,7 +58,7 @@ class PIDController(threading.Thread):
       # print self.is_enabled
       if self.is_enabled:
         new_manipulated_variable = self.compute_manipulated_variable()
-        # print "New Dest:" + str(new_manipulated_variable)
+        print "New Dest:" + str(new_manipulated_variable)
         if new_manipulated_variable is not None:
           self.set_manipulated_variable(new_manipulated_variable)
       elif self.should_stop:
@@ -77,20 +77,20 @@ class PIDController(threading.Thread):
     self.is_enabled = False
     self.should_stop = True
     self.lock.release()
-    
+
   def compute_manipulated_variable(self):
     point = self.savitzky_golay_filter.get_current_smoothed_point()
     derivative = self.savitzky_golay_filter.get_current_smoothed_derivative()
     if point == None or derivative == None:
-      return None 
+      return None
     self.integral = self.integral + point
-    # print "Values Integral: " + str(self.integral) + ", Point: " + str(point) + ", Derivative: " + str(derivative)
+    print "Values Integral: " + str(self.integral) + ", Point: " + str(point) + ", Derivative: " + str(derivative)
     new_value = (self.P * point) + (self.I * self.integral * self.sampling_interval_s) + (self.D * derivative)
     if new_value < 0 or new_value > 100:
       new_value = max(0, min(new_value, 100))
       self.integral = (new_value -(self.P * point) - (self.D * derivative))/(self.I * self.sampling_interval_s)
     return new_value
-  
+
   def pause(self):
     self.lock.acquire()
     self.is_enabled = False
@@ -103,7 +103,7 @@ class PIDController(threading.Thread):
     self.savitzky_golay_filter.resume()
     self.is_enabled = True
     self.lock.release()
-    
+
   def set_new_setpoint(self, new_setpoint):
     self.pause()
     self.setpoint = new_setpoint
@@ -116,7 +116,7 @@ class MockStove:
     self.curr_temp = start_temp
     self.last_update_time = get_curr_time_in_secs()
     self.dest_temp = start_temp
-    
+
   def get_temp(self):
     time_curr = get_curr_time_in_secs()
     if self.curr_temp == self.dest_temp:
@@ -129,21 +129,21 @@ class MockStove:
     if self.curr_temp > self.dest_temp:
       new_temp = self.curr_temp - degrees
     self.last_update_time = time_curr
-    # print "Time Delta: " + str(time_delta) + ", Curr Temp: " + str(self.curr_temp)+ ", New Temp: " + str(new_temp) 
+    # print "Time Delta: " + str(time_delta) + ", Curr Temp: " + str(self.curr_temp)+ ", New Temp: " + str(new_temp)
     self.curr_temp = new_temp
     return self.curr_temp
 
   def set_temp(self, temp):
     self.dest_temp = temp
     # print "Set temp to: " + str(temp)
-  
+
 if (__name__ == "__main__"):
   mock_stove = MockStove(30)
   pid = PIDController(0.8, 0.5, 0, # P, I, D
                       34,      # setpoint
-                      2,       # sampling interval   
+                      2,       # sampling interval
                       mock_stove.get_temp,
-                      mock_stove.set_temp) 
+                      mock_stove.set_temp)
   pid.start()
   pid.set_new_setpoint(34)
   time.sleep(30)
