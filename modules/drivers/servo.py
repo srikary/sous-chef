@@ -16,10 +16,9 @@ class Servo:
     self.move_delay = move_delay
     if (init_pos < 0 or init_pos > 180):
       raise ValueError("Initial position invalid:" + str(init_pos))
-
-    self.curr_pos = init_pos
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(bcm_pin, GPIO.OUT)
+    self.curr_pos = init_pos
     self.pwm = GPIO.PWM(bcm_pin, 100)
     self.pwm.start(get_dutycycle_for_angle(init_pos))
 
@@ -44,16 +43,31 @@ class Servo:
     return self.curr_pos
 
 if (__name__ == "__main__"):
-  # servo_pins = [22]
-  # for pin in servo_pins:
-  #  servo = Servo(pin, 0)
-  #  servo.move_to(180)
-  #  servo.move_to(0)
-  pin = 22
-  servo = Servo(pin, 0)
+  # Pin number, initial position
+  base_servo = Servo(21, 140)
+  vert_servo = Servo(20, 30)
+  hor_servo = Servo(26, 0)
+  tilt_servo = Servo(16, 130)
+  tip_servo = Servo(19, 5)
+  claw_servo = Servo(13, 55)
   while True:
     inp = raw_input("-->")
-    pos = int(inp)
-    print pos
-    servo.move_to(pos)
+    vals = inp.split()
+    if len(vals) != 2:
+      print "Invalid Input:" + inp
+      continue
+    servo_num = int(vals[0])
+    position = int(vals[1])
+    if servo_num == 1:
+      base_servo.move_to(position)
+    elif servo_num == 2:
+      vert_servo.move_to(position)
+    elif servo_num == 3:
+      hor_servo.move_to(position)
+    elif servo_num == 4:
+      tilt_servo.move_to(position)
+    elif servo_num == 5:
+      tip_servo.move_to(position)
+    else:
+      claw_servo.move_to(position)
 
