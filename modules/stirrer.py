@@ -62,8 +62,8 @@ class Stirrer:
       next_y = start_pos[1] + ((float(i) / max_delta) * delta[1])
       self.x_rail.move_to(next_x)
       self.y_rail.move_to(next_y)
-    self.x_rail.move_to(delta[0])
-    self.y_rail.move_to(delta[1])
+    self.x_rail.move_to(dest_pos[0])
+    self.y_rail.move_to(dest_pos[1])
 
   def execute_stir_stroke(self, start_pos, end_pos):
     self.stirrer_up()
