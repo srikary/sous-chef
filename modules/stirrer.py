@@ -12,41 +12,41 @@ def get_curr_time_in_secs():
 
 class Stirrer:
   # Dimensions of the Rails
-  max_x_rail_translation_mm = 380.0
-  max_y_rail_translation_mm = 325.0
+  max_x_rail_translation_mm = 370.0
+  max_y_rail_translation_mm = 305.0
   max_z_rail_translation_mm = 300.0
 
   z_up_pos = 0.0
-  z_down_pos = 120.0
-  x_utensil_pos = 190.0
-  y_utensil_pos = 162.0
+  z_down_pos = 5.0
+  x_utensil_pos = 180.0
+  y_utensil_pos = 142.0
 
-  x_lid_utensil_pos = 190.0
-  y_lid_utensil_pos = 192.0
+  x_lid_utensil_pos = 180.0
+  y_lid_utensil_pos = 305.0
 
-  x_home_pos = 5.0
-  y_home_pos = 5.0
+  x_home_pos = 0.0
+  y_home_pos = 0.0
 
   stirrer_x_offset = 45
   stirrer_y_offset = 45
 
-  stirrer_width_mm = 50.0
+  stirrer_width_mm = 58.0
 
   stir_start_gap = 5.0 # Distance from utensil wall where the stirrer starts a stroke.
   stir_stop_gap = 20.0 # Distance from utensil wall where the stirrer stops during a stroke.
 
   # Diameters of the three different all-clad utensils
-  utensil_diameter_mm = [270.0, 300.0, 150.0]
+  utensil_diameter_mm = [200.0, 300.0, 150.0]
 
   def __init__(self,
                x_rail_dir_pin, x_rail_step_pin,
                y_rail_dir_pin, y_rail_step_pin,
                z_rail_dir_pin, z_rail_step_pin):
     # TODO : Fill in values to the constructor below.
-    self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin, Stirrer.max_x_rail_translation_mm)
+    self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin, Stirrer.max_x_rail_translation_mm, inc_clockwise=False)
     self.y_rail = stepper_axis.StepperAxis(y_rail_dir_pin, y_rail_step_pin, Stirrer.max_y_rail_translation_mm)
     self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin, Stirrer.max_z_rail_translation_mm)
-    self.platform_position = PlatformPosition.BASE
+    self.position_platform_at_base()
 
   def move_to(self, dest_pos):
     start_pos = (self.x_rail.get_curr_pos_mm(), self.y_rail.get_curr_pos_mm())
@@ -127,7 +127,7 @@ class Stirrer:
     self.stirrer_up()
     self.x_rail.move_to(Stirrer.x_home_pos)
     self.y_rail.move_to(Stirrer.y_home_pos)
-    self.platform_position = PlatformPosition.UTENSIL
+    self.platform_position = PlatformPosition.BASE
 
   def position_platform_at_lid(self):
     self.stirrer_up()
@@ -171,13 +171,14 @@ if (__name__ == "__main__"):
   stirrer = Stirrer(7, 8,  # X Dir, Step
                    11, 25, # Y Dir, Step
                    9, 10)  # Z Dir, Step
+
   stirrer.position_platform_at_utensil()
   print "At Utensil"
   time.sleep(10)
   stirrer.position_platform_at_lid()
   print "At Lid"
   time.sleep(10)
-  stirrer.stir(0, 20)
+  stirrer.stir(0, 50)
   print "Done stirring"
   time.sleep(10)
   stirrer.position_platform_at_base()
