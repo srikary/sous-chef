@@ -24,9 +24,11 @@ class Servo:
     self.pwm.start(get_dutycycle_for_angle(init_pos))
 
   def set_angle(self, angle):
+    self.curr_pos = angle
     duty = get_dutycycle_for_angle(angle)
     self.pwm.ChangeDutyCycle(duty)
 
+  # Ensure that dest_angle is an int. Type check does not happen here.
   def move_to(self, dest_angle):
     if (dest_angle< 0 or dest_angle > 180):
       raise ValueError("Destination position invalid:" + str(dest_angle))
@@ -34,9 +36,9 @@ class Servo:
     if (dest_angle < self.curr_pos):
       direction = -1
     for angle in range(self.curr_pos, dest_angle, direction):
-      self.curr_pos = angle
-      self.set_angle(self.curr_pos)
+      self.set_angle(angle)
       time.sleep(self.move_delay)
+    self.set_angle(dest_angle)
 
   def get_current_pos(self):
     return self.curr_pos
