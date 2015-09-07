@@ -37,25 +37,26 @@ class StepperMotor:
       time.sleep(0.001)
       GPIO.output(self.step_pin, GPIO.LOW)
       time.sleep(self.delay_per_step)
+    return float(num_steps)/ StepperMotor.steps_per_rotation
 
   def set_speed(self, speed):
     self.delay_per_step = self.get_step_delay_from_speed(speed)
 
   def rotate_at_speed(self, speed, dir_is_clockwise, num_rotations):
     self.set_speed(speed)
-    self.rotate(dir_is_clockwise, num_rotations)
+    return self.rotate(dir_is_clockwise, num_rotations)
 
   def rotate_clockwise_at_speed(self, speed, num_rotations):
-    self.rotate_at_speed(speed, True, num_rotations)
+    return self.rotate_at_speed(speed, True, num_rotations)
 
   def rotate_anticlockwise_at_speed(self, speed, num_rotations):
-    self.rotate_at_speed(speed, False, num_rotations)
+    return self.rotate_at_speed(speed, False, num_rotations)
 
   def rotate_clockwise(self, num_rotations):
-    self.rotate(True, num_rotations)
+    return self.rotate(True, num_rotations)
 
   def rotate_anticlockwise(self, num_rotations):
-    self.rotate(False, num_rotations)
+    return self.rotate(False, num_rotations)
 
 if (__name__ == "__main__"):
   y_stepper = StepperMotor(6, 5, 60)

@@ -13,7 +13,7 @@ def get_curr_time_in_secs():
 class Stirrer:
   # Dimensions of the Rails
   max_x_rail_translation_mm = 370.0
-  max_y_rail_translation_mm = 305.0
+  max_y_rail_translation_mm = 315.0
   max_z_rail_translation_mm = 300.0
 
   z_up_pos = 0.0
@@ -36,16 +36,19 @@ class Stirrer:
   stir_stop_gap = 20.0 # Distance from utensil wall where the stirrer stops during a stroke.
 
   # Diameters of the three different all-clad utensils
-  utensil_diameter_mm = [200.0, 300.0, 150.0]
+  utensil_diameter_mm = [200.0, 270.0, 150.0]
 
   def __init__(self,
                x_rail_dir_pin, x_rail_step_pin,
                y_rail_dir_pin, y_rail_step_pin,
                z_rail_dir_pin, z_rail_step_pin):
     # TODO : Fill in values to the constructor below.
-    self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin, Stirrer.max_x_rail_translation_mm, inc_clockwise=False)
-    self.y_rail = stepper_axis.StepperAxis(y_rail_dir_pin, y_rail_step_pin, Stirrer.max_y_rail_translation_mm)
-    self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin, Stirrer.max_z_rail_translation_mm)
+    self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin,
+            Stirrer.max_x_rail_translation_mm, inc_clockwise=False)
+    self.y_rail = stepper_axis.StepperAxis(y_rail_dir_pin, y_rail_step_pin,
+            Stirrer.max_y_rail_translation_mm)
+    self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin,
+            Stirrer.max_z_rail_translation_mm)
     self.position_platform_at_base()
 
   def move_to(self, dest_pos):
@@ -59,6 +62,8 @@ class Stirrer:
       next_y = start_pos[1] + ((float(i) / max_delta) * delta[1])
       self.x_rail.move_to(next_x)
       self.y_rail.move_to(next_y)
+    self.x_rail.move_to(delta[0])
+    self.y_rail.move_to(delta[1])
 
   def execute_stir_stroke(self, start_pos, end_pos):
     self.stirrer_up()
@@ -163,6 +168,8 @@ class Stirrer:
         current = get_curr_time_in_secs()
         if (current  - start_time) > stir_for_seconds:
           break
+    self.stirrer_up()
+    self.position_platform_at_base()
 
   def shutdown(self):
     self.position_platform_at_base()

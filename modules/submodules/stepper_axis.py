@@ -17,18 +17,20 @@ class StepperAxis:
       raise ValueError("Invalid increment. Has to be positive:" + str(distance_in_mm))
     num_rotations = distance_in_mm * self.rotations_per_mm
     if self.inc_clockwise:
-      self.stepper.rotate_clockwise(num_rotations)
+      actual_rotations = self.stepper.rotate_clockwise(num_rotations)
     else:
-      self.stepper.rotate_anticlockwise(num_rotations)
+      actual_rotations = self.stepper.rotate_anticlockwise(num_rotations)
+    return float(actual_rotations)/self.rotations_per_mm
 
   def decrement_pos_by_mm(self, distance_in_mm):
     if distance_in_mm < 0:
       raise ValueError("Invalid decrement. Has to be positive:" + str(distance_in_mm))
     num_rotations = distance_in_mm * self.rotations_per_mm
     if self.inc_clockwise:
-      self.stepper.rotate_anticlockwise(num_rotations)
+      actual_rotations = self.stepper.rotate_anticlockwise(num_rotations)
     else:
-      self.stepper.rotate_clockwise(num_rotations)
+      actual_rotations = self.stepper.rotate_clockwise(num_rotations)
+    return float(actual_rotations)/self.rotations_per_mm
 
   # End private methods
 
@@ -37,10 +39,9 @@ class StepperAxis:
         raise ValueError("Invalid value:" + str(new_pos_mm) + " for new_pos_mm. Has to be within " +
                        " range(0," +str(self.max_translation_mm) + ")")
     if new_pos_mm > self.curr_pos_mm:
-      self.increment_pos_by_mm(new_pos_mm - self.curr_pos_mm)
+      self.curr_pos_mm += self.increment_pos_by_mm(new_pos_mm - self.curr_pos_mm)
     else:
-      self.decrement_pos_by_mm(self.curr_pos_mm - new_pos_mm)
-    self.curr_pos_mm = new_pos_mm
+      self.curr_pos_mm -= self.decrement_pos_by_mm(self.curr_pos_mm - new_pos_mm)
 
   def get_curr_pos_mm(self):
     return self.curr_pos_mm
