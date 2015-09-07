@@ -27,6 +27,9 @@ class Stirrer:
   x_home_pos = 5.0
   y_home_pos = 5.0
 
+  stirrer_x_offset = 45
+  stirrer_y_offset = 45
+
   stirrer_width_mm = 50.0
 
   stir_start_gap = 5.0 # Distance from utensil wall where the stirrer starts a stroke.
@@ -75,21 +78,33 @@ class Stirrer:
     return 2 * math.sqrt((utensil_radius * utensil_radius) - (dist_from_center * dist_from_center))
 
   def one_stir_stroke(self, dist_from_center, utensil_index, top_to_bottom):
-    cord_length = self.get_cord_length_mm(dist_from_center, utensil_index)
-    start_x = Stirrer.x_home_pos - dist_from_center
-    if dist_from_center > 0:
-      start_x = start_x + (Stirrer.stirrer_width_mm / 2)
-    else:
-      start_x = start_x - (Stirrer.stirrer_width_mm / 2)
+    print "Stroke:" + str(dist_from_center)+ ", " + str(top_to_bottom)
+    stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
+    utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
+    # Compute the max height that the stirrer can stir on this stroke
+    edge_dist_from_center = dist_from_center + stirrer_width_half
+    if dist_from_center < 0:
+      edge_dist_from_center = dist_from_center - stirrer_width_half
+    # This stroke will keep the edge out of bounds. Return without doing anything.
+    if abs(edge_dist_from_center) >= utensil_radius:
+        return
+    cord_length = self.get_cord_length_mm(edge_dist_from_center, utensil_index)
+
+    # Coordinates for the center of the platform for which the stirrer is at the
+    # center of the utensil
+    stirrer_x_center = Stirrer.x_utensil_pos + Stirrer.stirrer_x_offset
+    stirrer_y_center = Stirrer.y_utensil_pos + Stirrer.stirrer_y_offset
+
+    x_delta = stirrer_x_center + dist_from_center
 
     if top_to_bottom:
-      start_y = Stirrer.y_home_pos + (cord_length / 2) - Stirrer.stir_start_gap
-      end_y = start_y - cord_length + Stirrer.stir_stop_gap
+      start_y = stirrer_y_center + (cord_length / 2) - Stirrer.stir_start_gap
+      end_y = start_y - cord_length + Stirrer.stir_stop_gap + Stirrer.stir_start_gap
     else:
-      start_y = Stirrer.y_home_pos - (cord_length / 2) + Stirrer.stir_start_gap
-      end_y = start_y + cord_length - Stirrer.stir_stop_gap
-
-    self.execute_stir_stroke((start_x, start_y), (start_x, end_y))
+      start_y = stirrer_y_center - (cord_length / 2) + Stirrer.stir_start_gap
+      end_y = start_y + cord_length - Stirrer.stir_stop_gap - Stirrer.stir_start_gap
+    print "Executing stroke: " + repr(x_delta) + ", " + repr(start_y) + ", " + repr(end_y)
+    self.execute_stir_stroke((x_delta, start_y), (x_delta, end_y))
 
   ################  Public methods. #################
 
@@ -142,7 +157,7 @@ class Stirrer:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
-      for dist_from_center in range(int(utensil_radius - Stirrer.stir_start_gap), int(-utensil_radius), stir_dx):
+      for dist_from_center in range(int(utensil_radius), int(-utensil_radius), stir_dx):
         self.one_stir_stroke(dist_from_center, utensil_index, top_to_bottom)
         top_to_bottom = not top_to_bottom
         current = get_curr_time_in_secs()
@@ -156,7 +171,6 @@ if (__name__ == "__main__"):
   stirrer = Stirrer(7, 8,  # X Dir, Step
                    11, 25, # Y Dir, Step
                    9, 10)  # Z Dir, Step
-  stirrer.stir(0, 20)
   stirrer.position_platform_at_utensil()
   print "At Utensil"
   time.sleep(10)
@@ -166,6 +180,6 @@ if (__name__ == "__main__"):
   stirrer.stir(0, 20)
   print "Done stirring"
   time.sleep(10)
-  stirrer.stirrer_goto_base()
+  stirrer.position_platform_at_base()
   print "At Base"
   time.sleep(10)
