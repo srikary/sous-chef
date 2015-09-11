@@ -11,12 +11,12 @@ def get_pulse_lengths(freq, resolution):
   T_ms = float(1000)/freq
   # Period per quantile (due to the resolution)
   T_quantile = T_ms/resolution
-  angles = []
+  angle_to_quantile = range(181)
   for angle in range(0, 181):
     time_ms_required = 1 + float(angle)/180
     quantile_required = time_ms_required/T_quantile
-    angles[angle] = quantile_required
-  return angles
+    angle_to_quantile[angle] = int(quantile_required)
+  return angle_to_quantile
 
 class Servo:
   """ Wrapper interface to a Servo."""
@@ -39,14 +39,14 @@ class Servo:
     self.driver_channel = driver_channel
     self.pwm = PWM(Servo.driver_address)
     self.pwm.setPWMFreq(Servo.pwm_freq)
-    self.angles = get_pulse_lengths(Servo.pwm_freq, Servo.driver_resolution)
+    self.angle_to_quantile = get_pulse_lengths(Servo.pwm_freq, Servo.driver_resolution)
     self.set_angle(init_pos)
 
   def set_angle(self, angle):
     if (angle < 0 or angle > 180):
       raise ValueError("Destination position invalid:" + str(angle))
     self.curr_pos = angle
-    self.pwm.setPWM(self.driver_channnel, 0, angles[angle])
+    self.pwm.setPWM(self.driver_channel, 0, self.angle_to_quantile[angle])
 
   # Ensure that dest_angle is an int. Type check does not happen here.
   def move_to(self, dest_angle):
@@ -66,7 +66,6 @@ class Servo:
 if (__name__ == "__main__"):
   channel = 0
   servo = Servo(channel, 0)
-  print servo.angles
   while True:
     inp = raw_input("-->")
     pos = int(inp)

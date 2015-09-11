@@ -1,10 +1,10 @@
-import drivers.servo as servo
+from drivers.servo_driver impor Servo
 
 class Lid:
   """ Interface to the Lid."""
   open_pos = 0
   close_pos = 180
-  def __init__(self, lid_servo_bcm_pin):
+  def __init__(self, lid_servo_channel):
     """
         lid_servo_bcm_pin: Provide the pin (BCM numbering) that the lid Servo
         is connected to.
