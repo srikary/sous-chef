@@ -1,4 +1,4 @@
-import drivers.servo as servo
+from drivers.servo_driver import Servo
 import submodules.pid_controller as pid_controller
 import RPi.GPIO as GPIO
 import time
@@ -22,13 +22,13 @@ class StoveController:
   kI = 0.5
   kD = 0.0
 
-  def __init__(self, servo_bcm_pin, switch_bcm_pin, sampling_interval_s = 5):
+  def __init__(self, servo_channel, switch_bcm_pin, sampling_interval_s = 5):
     """
-        servo_bcm_pin: Provide the pin (BCM numbering) that the lid Servo
-                       is connected to.
+        servo_channel: Provide the channel (on the Servo driver) that the lid
+                       Servo is connected to.
         init_pos: A number between 0 and 180 that specifies the initial angle
     """
-    self.servo = servo.Servo(servo_bcm_pin, StoveController.low_pos)
+    self.servo = Servo(servo_channel, StoveController.low_pos)
     self.switch_bcm_pin = switch_bcm_pin
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(self.switch_bcm_pin, GPIO.OUT)

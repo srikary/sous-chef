@@ -64,11 +64,31 @@ class Servo:
     return self.curr_pos
 
 if (__name__ == "__main__"):
-  channel = 0
-  servo = Servo(channel, 0)
+  # Pin number, initial position
+  base_servo = Servo(0, 140)
+  vert_servo = Servo(1, 30)
+  hor_servo = Servo(2, 0)
+  tilt_servo = Servo(3, 130)
+  tip_servo = Servo(4, 5)
+  claw_servo = Servo(5, 55)
   while True:
     inp = raw_input("-->")
-    pos = int(inp)
-    print pos
-    servo.move_to(pos)
+    vals = inp.split()
+    if len(vals) != 2:
+      print "Invalid Input:" + inp
+      continue
+    servo_num = int(vals[0])
+    position = int(vals[1])
+    if servo_num == 1:
+      base_servo.move_to(position)
+    elif servo_num == 2:
+      vert_servo.move_to(position)
+    elif servo_num == 3:
+      hor_servo.move_to(position)
+    elif servo_num == 4:
+      tilt_servo.move_to(position)
+    elif servo_num == 5:
+      tip_servo.move_to(position)
+    else:
+      claw_servo.move_to(position)
 

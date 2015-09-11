@@ -1,4 +1,4 @@
-import drivers.servo as servo
+from drivers.servo_driver import Servo
 import submodules.stepper_axis as stepper_axis
 
 from math import atan, degrees
@@ -39,18 +39,18 @@ class RoboticArm:
   max_rail_translation_mm = 520
   
   def __init__(self, rail_dir_pin, rail_step_pin,
-               base_servo_pin,
-               vertical_servo_pin,
-               horizontal_servo_pin,
-               level_servo_pin,
-               tipping_servo_pin,
-               grasp_servo_pin):
-    self.base_servo = servo.Servo(base_servo_pin)
-    self.vertical_servo = servo.Servo(vertical_servo_pin)
-    self.horizontal_servo = servo.Servo(horizontal_servo_pin)
-    self.level_servo = servo.Servo(level_servo_pin)
-    self.tipping_servo = servo.Servo(tipping_servo_pin)
-    self.grasp_servo = servo.Servo(grasp_servo_pin)
+               base_servo_channel,
+               vertical_servo_channel,
+               horizontal_servo_channel,
+               level_servo_channel,
+               tipping_servo_channel,
+               grasp_servo_channel):
+    self.base_servo = Servo(base_servo_channel)
+    self.vertical_servo = Servo(vertical_servo_channel)
+    self.horizontal_servo = Servo(horizontal_servo_channel)
+    self.level_servo = Servo(level_servo_channel)
+    self.tipping_servo = Servo(tipping_servo_channel)
+    self.grasp_servo = Servo(grasp_servo_channel)
     self.rail = stepper_axis.StepperAxis(rail_dir_pin, rail_step_pin,
                                          RoboticArm.max_rail_translation_mm,
                                          inc_clockwise=False)
@@ -191,12 +191,12 @@ class RoboticArm:
     
 if (__name__ == "__main__"):
   arm = RoboticArm(6, 5,
-                   21, # Base
-                   20, # Vertical
-                   26, # Horizontal
-                   16, # Level/Tilt
-                   19, # Tipping
-                   13) # Claw
+                   0, # Base
+                   1, # Vertical
+                   2, # Horizontal
+                   3, # Level/Tilt
+                   4, # Tipping
+                   5) # Claw
   #arm.move_to_base()
   #arm.add_cup(True, 1, 0)
   #arm.add_cup(True, 2, 0)
