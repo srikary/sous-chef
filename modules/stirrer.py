@@ -14,11 +14,12 @@ class Stirrer:
   # Dimensions of the Rails
   max_x_rail_translation_mm = 370.0
   max_y_rail_translation_mm = 315.0
-  max_z_rail_translation_mm = 110.0
+  max_z_rail_translation_mm = 100.0
+  z_rotations_per_mm = 0.79
 
 
   z_up_pos = 0
-  z_mid_pos = 60.0
+  z_mid_pos = 85.0
   z_down_pos = 100.0
   x_utensil_pos = 180.0
   y_utensil_pos = 142.0
@@ -45,12 +46,13 @@ class Stirrer:
                y_rail_dir_pin, y_rail_step_pin, y_rail_enable_pin,
                z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin):
     # TODO : Fill in values to the constructor below.
-    self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin,
+    self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin, x_rail_enable_pin,
             Stirrer.max_x_rail_translation_mm, inc_clockwise=False)
-    self.y_rail = stepper_axis.StepperAxis(y_rail_dir_pin, y_rail_step_pin,
+    self.y_rail = stepper_axis.StepperAxis(y_rail_dir_pin, y_rail_step_pin, y_rail_enable_pin,
             Stirrer.max_y_rail_translation_mm)
-    self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin,
-            Stirrer.max_z_rail_translation_mm)
+    self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin,
+            max_translation_mm=Stirrer.max_z_rail_translation_mm,
+            inc_clockwise=True, speed=180, rotations_per_mm=Stirrer.z_rotations_per_mm)
     self.position_platform_at_base()
 
   def disable(self):
