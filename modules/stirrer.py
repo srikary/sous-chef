@@ -16,6 +16,7 @@ class Stirrer:
   max_y_rail_translation_mm = 315.0
   max_z_rail_translation_mm = 300.0
 
+
   z_up_pos = 0.0
   z_down_pos = 5.0
   x_utensil_pos = 180.0
@@ -39,9 +40,9 @@ class Stirrer:
   utensil_diameter_mm = [200.0, 270.0, 150.0]
 
   def __init__(self,
-               x_rail_dir_pin, x_rail_step_pin,
-               y_rail_dir_pin, y_rail_step_pin,
-               z_rail_dir_pin, z_rail_step_pin):
+               x_rail_dir_pin, x_rail_step_pin, x_rail_enable_pin,
+               y_rail_dir_pin, y_rail_step_pin, y_rail_enable_pin,
+               z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin,):
     # TODO : Fill in values to the constructor below.
     self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin,
             Stirrer.max_x_rail_translation_mm, inc_clockwise=False)
@@ -51,6 +52,11 @@ class Stirrer:
             Stirrer.max_z_rail_translation_mm)
     self.position_platform_at_base()
 
+  def disable(self):
+    self.x_rail.disable()
+    self.y_rail.disable()
+    self.z_rail.disable()
+    
   def move_to(self, dest_pos):
     start_pos = (self.x_rail.get_curr_pos_mm(), self.y_rail.get_curr_pos_mm())
     delta = ((dest_pos[0] - self.x_rail.get_curr_pos_mm()),
@@ -133,12 +139,14 @@ class Stirrer:
     self.x_rail.move_to(Stirrer.x_home_pos)
     self.y_rail.move_to(Stirrer.y_home_pos)
     self.platform_position = PlatformPosition.BASE
+    self.disable()
 
   def position_platform_at_lid(self):
     self.stirrer_up()
     self.x_rail.move_to(Stirrer.x_lid_utensil_pos)
     self.y_rail.move_to(Stirrer.y_lid_utensil_pos)
     self.platform_position = PlatformPosition.LID
+    self.disable()
 
   def is_platform_at_base(self):
     return self.platform_position == PlatformPosition.BASE

@@ -4,13 +4,18 @@ import modules.robotic_arm
 import modules.stirrer
 import modules.stove_controller
 import ConfigParser
+import RPi.GPIO as GPIO
 
 class SousChef:
   def __init__(utensil_index, conf_file="config/sous-chef.conf"):
     self.utensil_index = utensil_index
     config = ConfigParser.RawConfigParser()
     config.read(conf_file)
-    self.lid = lid.Lid(config.getint("Lid", "modules.lid.servo.bcm_pin"),
+    GPIO.setmode(GPIO.BCM)
+    self.servo_driver_enable_pin = config.getint("RoboticArm", "modules.servo.enable_bcm_pin"
+    GPIO.setup(self.servo_driver_enable_pin, GPIO.OUT)
+    GPIO.output(self.servo_driver_enable_pin, GPIO.HIGH)
+    self.lid = lid.Lid(config.getint("Lid", "modules.lid.servo.channel"),
                        config.getint("Lid", "modules.lid.servo.open_pos"))
 
     self.water_pump = pump.Pump(config.getint("WaterPump", "modules.water_pump.relay.bcm_pin"),
@@ -23,21 +28,25 @@ class SousChef:
 
     self.robotic_arm = robotic_arm.RoboticArm(config.getint("RoboticArm", "modules.arm.rail.dir_bcm_pin"),
                                               config.getint("RoboticArm", "modules.arm.rail.step_bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.base_servo.bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.vertical_servo.bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.horizontal_servo.bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.level_servo.bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.tipping_servo.bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.grasp_servo.bcm_pin"))
+                                              config.getint("RoboticArm", "modules.arm.rail.enable_pin"),
+                                              config.getint("RoboticArm", "modules.arm.base_servo.channel"),
+                                              config.getint("RoboticArm", "modules.arm.vertical_servo.channel"),
+                                              config.getint("RoboticArm", "modules.arm.horizontal_servo.channel"),
+                                              config.getint("RoboticArm", "modules.arm.level_servo.channel"),
+                                              config.getint("RoboticArm", "modules.arm.tipping_servo.channel"),
+                                              config.getint("RoboticArm", "modules.arm.grasp_servo.channel"))
 
     self.stirrer = stirrer.Stirrer(config.getint("Stirrer", "modules.stirrer.x_rail.dir_pin"),
                                    config.getint("Stirrer", "modules.stirrer.x_rail.step_pin"),
+                                   config.getint("Stirrer", "modules.stirrer.x_rail.enable_pin"),
                                    config.getint("Stirrer", "modules.stirrer.y_rail.dir_pin"),
                                    config.getint("Stirrer", "modules.stirrer.y_rail.step_pin"),
+                                   config.getint("Stirrer", "modules.stirrer.y_rail.enable_pin"),
                                    config.getint("Stirrer", "modules.stirrer.z_rail.dir_pin"),
-                                   config.getint("Stirrer", "modules.stirrer.z_rail.step_pin"))
+                                   config.getint("Stirrer", "modules.stirrer.z_rail.step_pin"),
+                                   config.getint("Stirrer", "modules.stirrer.z_rail.enable_pin"),)
 
-    self.stove_controller = stove_controller.StoveController(config.getint("StoveController", "modules.stove_controller.servo.bcm_pin"),
+    self.stove_controller = stove_controller.StoveController(config.getint("StoveController", "modules.stove_controller.servo.channel"),
                                                              config.getint("StoveController", "modules.stove_controller.switch.bcm_pin"),
                                                              config.getint("StoveController", "modules.stove_controller.sampling_interval_sec"))
 

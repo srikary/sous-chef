@@ -38,7 +38,7 @@ class RoboticArm:
   # Dimensions of the Rail
   max_rail_translation_mm = 520
   
-  def __init__(self, rail_dir_pin, rail_step_pin,
+  def __init__(self, rail_dir_pin, rail_step_pin, rail_enable_pin,
                base_servo_channel,
                vertical_servo_channel,
                horizontal_servo_channel,
@@ -51,7 +51,7 @@ class RoboticArm:
     self.level_servo = Servo(level_servo_channel)
     self.tipping_servo = Servo(tipping_servo_channel)
     self.grasp_servo = Servo(grasp_servo_channel)
-    self.rail = stepper_axis.StepperAxis(rail_dir_pin, rail_step_pin,
+    self.rail = stepper_axis.StepperAxis(rail_dir_pin, rail_step_pin, rail_enable_pin,
                                          RoboticArm.max_rail_translation_mm,
                                          inc_clockwise=False)
     self.move_to_base()
@@ -165,6 +165,7 @@ class RoboticArm:
     self.execute_move_claw_xz(RoboticArm.base_pos)
     self.base_servo.move_to(RoboticArm.base_pos[1])
     self.rail.move_to(RoboticArm.base_pos[0])
+    self.rail.disable()
     self.at_base = True
     None
 
@@ -185,6 +186,7 @@ class RoboticArm:
     self.move_to_cup(is_small_cup, cup_num)
     self.claw_release()
     self.move_to_base()
+    self.rail.disable()
 
   def shutdown(self):
     self.move_to_base()
