@@ -7,7 +7,7 @@ class StepperMotor:
   steps_per_rotation = 200
   min_delay_per_step = 0.001
 
-  def __init__(self, dir_pin, step_pin, enable_pin, speed=30):
+  def __init__(self, dir_pin, step_pin, enable_pin, speed=90):
     GPIO.setmode(GPIO.BCM)
     self.direction_pin = dir_pin
     self.step_pin = step_pin
@@ -17,15 +17,15 @@ class StepperMotor:
     GPIO.setup(self.step_pin, GPIO.OUT)
     GPIO.output(self.step_pin, GPIO.LOW)
     GPIO.setup(self.enable_pin, GPIO.OUT)
-    GPIO.output(self.enable_pin, GPIO.LOW)
+    self.disable()
     self.delay_per_step = self.get_step_delay_from_speed(speed)
 
   def enable(self):
-    GPIO.output(self.enable_pin, GPIO.HIGH)
+    GPIO.output(self.enable_pin, GPIO.LOW)
 
   def disable(self):
-    GPIO.output(self.enable_pin, GPIO.LOW)
-    
+    GPIO.output(self.enable_pin, GPIO.HIGH)
+
   def get_step_delay_from_speed(self, speed):
     """ Converts the speed (in rpm) to the delay between each step """
     rotations_per_second = float(speed) / 60
@@ -68,10 +68,10 @@ class StepperMotor:
     return self.rotate(False, num_rotations)
 
 if (__name__ == "__main__"):
-  y_stepper = StepperMotor(6, 5, 20, 60)
-  x_stepper = StepperMotor(9, 10, 16, 60)
-  z_stepper = StepperMotor(7, 8, 21, 60)
-  r_stepper = StepperMotor(11, 25, 26, 60)
+  y_stepper = StepperMotor(11, 25, 20, 60)
+  x_stepper = StepperMotor(7, 8, 19, 60)
+  z_stepper = StepperMotor(9, 10, 21, 60)
+  r_stepper = StepperMotor(6, 5, 26, 60)
   while True:
     inp = raw_input("-->")
     vals = inp.split()
@@ -84,10 +84,10 @@ if (__name__ == "__main__"):
       direction = False
       rotations = abs(rotations)
     if motor_num == 1:
-      y_stepper.rotate_at_speed(20, direction, rotations)
+      y_stepper.rotate_at_speed(60, direction, rotations)
     elif motor_num == 2:
-      x_stepper.rotate_at_speed(30, direction, rotations)
+      x_stepper.rotate_at_speed(60, direction, rotations)
     elif motor_num == 3:
-      z_stepper.rotate_at_speed(30, direction, rotations)
+      z_stepper.rotate_at_speed(120, direction, rotations)
     else:
-      r_stepper.rotate_at_speed(30, direction, rotations)
+      r_stepper.rotate_at_speed(60, direction, rotations)

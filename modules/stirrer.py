@@ -14,11 +14,12 @@ class Stirrer:
   # Dimensions of the Rails
   max_x_rail_translation_mm = 370.0
   max_y_rail_translation_mm = 315.0
-  max_z_rail_translation_mm = 300.0
+  max_z_rail_translation_mm = 110.0
 
 
-  z_up_pos = 0.0
-  z_down_pos = 5.0
+  z_up_pos = 0
+  z_mid_pos = 60.0
+  z_down_pos = 100.0
   x_utensil_pos = 180.0
   y_utensil_pos = 142.0
 
@@ -42,7 +43,7 @@ class Stirrer:
   def __init__(self,
                x_rail_dir_pin, x_rail_step_pin, x_rail_enable_pin,
                y_rail_dir_pin, y_rail_step_pin, y_rail_enable_pin,
-               z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin,):
+               z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin):
     # TODO : Fill in values to the constructor below.
     self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin,
             Stirrer.max_x_rail_translation_mm, inc_clockwise=False)
@@ -56,7 +57,7 @@ class Stirrer:
     self.x_rail.disable()
     self.y_rail.disable()
     self.z_rail.disable()
-    
+
   def move_to(self, dest_pos):
     start_pos = (self.x_rail.get_curr_pos_mm(), self.y_rail.get_curr_pos_mm())
     delta = ((dest_pos[0] - self.x_rail.get_curr_pos_mm()),
@@ -72,11 +73,11 @@ class Stirrer:
     self.y_rail.move_to(dest_pos[1])
 
   def execute_stir_stroke(self, start_pos, end_pos):
-    self.stirrer_up()
+    self.stirrer_mid()
     self.move_to(start_pos)
     self.stirrer_down()
     self.move_to(end_pos)
-    self.stirrer_up()
+    self.stirrer_mid()
 
   def get_cord_length_mm(self, dist_from_center, utensil_index):
     if utensil_index >= 3:
@@ -121,6 +122,9 @@ class Stirrer:
 
   def stirrer_up(self):
     self.z_rail.move_to(Stirrer.z_up_pos)
+
+  def stirrer_mid(self):
+    self.z_rail.move_to(Stirrer.z_mid_pos)
 
   def stirrer_down(self):
     self.z_rail.move_to(Stirrer.z_down_pos)
@@ -183,9 +187,9 @@ class Stirrer:
     self.position_platform_at_base()
 
 if (__name__ == "__main__"):
-  stirrer = Stirrer(7, 8,  # X Dir, Step
-                   11, 25, # Y Dir, Step
-                   9, 10)  # Z Dir, Step
+  stirrer = Stirrer(7, 8, 19,  # X Dir, Step, Enable
+                   11, 25, 20, # Y Dir, Step, Enable
+                   9, 10, 21)  # Z Dir, Step, Enable
 
   stirrer.position_platform_at_utensil()
   print "At Utensil"
