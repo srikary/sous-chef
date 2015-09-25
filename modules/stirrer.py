@@ -6,6 +6,7 @@ class PlatformPosition:
   BASE = 1
   UTENSIL = 2
   LID = 3
+  IN_BETWEEN = 4
 
 def get_curr_time_in_secs():
   return time.mktime(time.localtime())
@@ -40,6 +41,11 @@ class Stirrer:
 
   # Diameters of the three different all-clad utensils
   utensil_diameter_mm = [200.0, 270.0, 150.0]
+
+  platform_pos_for_cup = [(180, 0), # SmallCup1
+                          (180, 0), # SmallCup2
+                          (180, 0), # LargeCup1
+                          (180, 0)] # LargeCup2
 
   def __init__(self,
                x_rail_dir_pin, x_rail_step_pin, x_rail_enable_pin,
@@ -185,6 +191,15 @@ class Stirrer:
     self.stirrer_up()
     self.position_platform_at_base()
 
+  def position_platform_for_cup(self, cup_num):
+    self.stirrer_up()
+    if cup_num < 1 or cup_num > 4:
+      raise ValueError("Cup number has to be one of {1, 2, 3, 4}")
+    cup_idx = cup_num - 1
+    self.move_to(Stirrer.platform_pos_for_cup[cup_idx][0],
+                 Stirrer.platform_pos_for_cup[cup_idx][1])
+    self.platform_position = PlatformPosition.IN_BETWEEN
+    
   def shutdown(self):
     self.position_platform_at_base()
 

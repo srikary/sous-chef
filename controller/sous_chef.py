@@ -1,6 +1,6 @@
 import modules.lid
 import modules.pump
-import modules.robotic_arm
+import modules.cup_dispenser
 import modules.stirrer
 import modules.stove_controller
 import ConfigParser
@@ -12,7 +12,7 @@ class SousChef:
     config = ConfigParser.RawConfigParser()
     config.read(conf_file)
     GPIO.setmode(GPIO.BCM)
-    self.servo_driver_enable_pin = config.getint("RoboticArm", "modules.servo.enable_bcm_pin"
+    self.servo_driver_enable_pin = config.getint("CupDispenser", "modules.servo.enable_bcm_pin")
     GPIO.setup(self.servo_driver_enable_pin, GPIO.OUT)
     GPIO.output(self.servo_driver_enable_pin, GPIO.HIGH)
     self.lid = lid.Lid(config.getint("Lid", "modules.lid.servo.channel"),
@@ -26,15 +26,10 @@ class SousChef:
                               config.getint("OilPump", "modules.oil_pump.prime_time_msec"),
                               config.getint("OilPump", "modules.oil_pump.time_per_ml_msec"))
 
-    self.robotic_arm = robotic_arm.RoboticArm(config.getint("RoboticArm", "modules.arm.rail.dir_bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.rail.step_bcm_pin"),
-                                              config.getint("RoboticArm", "modules.arm.rail.enable_pin"),
-                                              config.getint("RoboticArm", "modules.arm.base_servo.channel"),
-                                              config.getint("RoboticArm", "modules.arm.vertical_servo.channel"),
-                                              config.getint("RoboticArm", "modules.arm.horizontal_servo.channel"),
-                                              config.getint("RoboticArm", "modules.arm.level_servo.channel"),
-                                              config.getint("RoboticArm", "modules.arm.tipping_servo.channel"),
-                                              config.getint("RoboticArm", "modules.arm.grasp_servo.channel"))
+    self.cup_dispenser = cup_dispenser.CupDispenser(config.getint("CupDispenser", "modules.dispenser.small_cup1.channel"),
+                                                    config.getint("CupDispenser", "modules.dispenser.small_cup2.channel"),
+                                                    config.getint("CupDispenser", "modules.dispenser.large_cup1.channel"),
+                                                    config.getint("CupDispenser", "modules.dispenser.large_cup2.channel"))
 
     self.stirrer = stirrer.Stirrer(config.getint("Stirrer", "modules.stirrer.x_rail.dir_pin"),
                                    config.getint("Stirrer", "modules.stirrer.x_rail.step_pin"),
@@ -55,8 +50,8 @@ class SousChef:
       raise ValueError("Cannot move platform. One of the pumps is On")
     if not self.stirrer.is_stirrer_up():
       raise ValueError("Cannot move platform. Raise stirrer before moving the platform.")
-    if not self.robotic_arm.is_at_base():
-      raise ValueError("Cannot move platform. Move arm to base before moving the platform.")
+    if not self.cup_dispenser.are_all_on_hold():
+      raise ValueError("Cannot move platform. Let the cup dispenser finish dispensing.")
     if not self.lid.is_open():
       raise ValueError("Cannot move platform. Raise lid before moving the platform.")
     self.stove_controller.hold_freeze()
@@ -70,8 +65,8 @@ class SousChef:
   def prepare_to_stir(self):
     if self.water_pump.is_open() or self.oil_pump.is_open:
       raise ValueError("Cannot move platform. One of the pumps is On")
-    if not self.robotic_arm.is_at_base():
-      raise ValueError("Cannot move platform. Move arm to base before moving the platform.")
+    if not self.cup_dispenser.are_all_on_hold():
+      raise ValueError("Cannot move platform. Let the cup dispenser finish dispensing.")
     if not self.lid.is_open():
       raise ValueError("Cannot move platform. Raise lid before moving the platform.")
     self.ensure_or_position_platform_over_utensil()
@@ -105,14 +100,15 @@ class SousChef:
     self.ensure_or_position_platform_over_utensil()
     self.stove_controller.set_temperature_C(temperature)
     
-  def add_cup(self, is_small_cup, cup_num):
-    self.self.ensure_or_position_platform_over_utensil()
-    self.robotic_arm.add_cup(is_small_cup, cup_num, self.utensil_size)
+  def add_cup(self, cup_num):
+    self.prepare_to_move()
+    self.stirrer.position_platform_for_cup(cup_num)
+    self.cup_dispenser.pour_cup(cup_num)
 
   def shutdown(self):
     self.stove_controller.shutdown()
-    self.robotic_arm.shutdown()
     self.lid.shutdown()
     self.water_pump.shutdown()
     self.oil_pump.shutdown()
+    self.cup_dispenser.shutdown()
     self.stirrer.shutdown()
