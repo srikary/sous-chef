@@ -50,7 +50,6 @@ class Servo:
     if (angle < 0 or angle > 180):
       raise ValueError("Destination position invalid:" + str(angle))
     self.curr_pos = angle
-    print self.angle_to_quantile[angle]
     self.pwm.setPWM(self.driver_channel, 0, self.angle_to_quantile[angle])
 
   # Ensure that dest_angle is an int. Type check does not happen here.
@@ -73,12 +72,12 @@ if (__name__ == "__main__"):
   GPIO.setup(13, GPIO.OUT)
   GPIO.output(13, GPIO.LOW)
   # Pin number, initial position
-  base_servo = Servo(0, 140, move_delay=0.005)
-  vert_servo = Servo(1, 30)
-  hor_servo = Servo(2, 0)
-  tilt_servo = Servo(4, 130)
-  tip_servo = Servo(3, 5)
-  claw_servo = Servo(5, 55)
+  base_servo = Servo(0, 175, move_delay=0.01)
+  vert_servo = Servo(1, 130)
+  hor_servo = Servo(2, 163)
+  tilt_servo = Servo(3, 161)
+  tip_servo = Servo(4, 90)
+  claw_servo = Servo(5, 90)
   while True:
     inp = raw_input("-->")
     vals = inp.split()
