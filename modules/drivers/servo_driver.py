@@ -1,19 +1,23 @@
 from Adafruit_PWM_Servo_Driver import PWM
+import RPi.GPIO as GPIO
 import time
 
 # A Servo PWM has the following encoding,
-#  1.0millisecond pulse length is position 0
+#  0.6millisecond pulse length is position 0
 #  1.5millisecond pulse length is position 90
-#  2.0millisecond pulse length is position 180
+#  2.3millisecond pulse length is position 180
 
 def get_pulse_lengths(freq, resolution):
+  pw_pos0 = 0.6
+  pw_pos180 = 2.3
   # Period of the waveform in milliseconds
   T_ms = float(1000)/freq
   # Period per quantile (due to the resolution)
   T_quantile = T_ms/resolution
   angle_to_quantile = range(181)
+  pw_range = pw_pos180 - pw_pos0
   for angle in range(0, 181):
-    time_ms_required = 1 + float(angle)/180
+    time_ms_required = pw_pos0 + float(angle * pw_range)/180
     quantile_required = time_ms_required/T_quantile
     angle_to_quantile[angle] = int(quantile_required)
   return angle_to_quantile
@@ -64,12 +68,15 @@ class Servo:
     return self.curr_pos
 
 if (__name__ == "__main__"):
+  GPIO.setmode(GPIO.BCM)
+  GPIO.setup(13, GPIO.OUT)
+  GPIO.output(13, GPIO.LOW)
   # Pin number, initial position
-  base_servo = Servo(0, 140)
+  base_servo = Servo(0, 140, move_delay=0.005)
   vert_servo = Servo(1, 30)
   hor_servo = Servo(2, 0)
-  tilt_servo = Servo(3, 130)
-  tip_servo = Servo(4, 5)
+  tilt_servo = Servo(4, 130)
+  tip_servo = Servo(3, 5)
   claw_servo = Servo(5, 55)
   while True:
     inp = raw_input("-->")
