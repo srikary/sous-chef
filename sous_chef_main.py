@@ -71,7 +71,7 @@ class MakeRecipeCommand(cmd.Cmd):
     
   def help_lid(self):
     print """Command to open or close the lid. Invoke only when this operation is possible. e.g.
-          Robotic Arm is out of the way, pumps are off, stirrer is up.
+          cup dispenser is out of the way, pumps are off, stirrer is up.
           Usage: lid {open,close} """
     
   def do_lid(self, line):
@@ -90,7 +90,7 @@ class MakeRecipeCommand(cmd.Cmd):
 
   def help_lid(self):
     print """Command to open or close the lid. Invoke only when this operation is possible. e.g.
-          Robotic Arm is out of the way, pumps are off, stirrer is up.
+          cup dispenser is out of the way, pumps are off, stirrer is up.
           Usage: lid {open,close} """
 
   def do_addwater(self, line):
@@ -104,7 +104,7 @@ class MakeRecipeCommand(cmd.Cmd):
 
   def help_addwater(self):
     print """ Command to add num_cups water in cups to the utensil. Ensure that this
-              move can be executed. e.g. robotic arm is out of the way, lid is open
+              move can be executed. e.g. cup dispenser is out of the way, lid is open
               Usage: addwater 1.5 """
     
   def do_addoil(self, line):
@@ -118,7 +118,7 @@ class MakeRecipeCommand(cmd.Cmd):
 
   def help_addoil(self):
     print """ Command to add num_tbsp tablespoons of oil to the utensil. Ensure that this
-              move can be executed. e.g. robotic arm is out of the way, lid is open
+              move can be executed. e.g. cup dispenser is out of the way, lid is open
               Usage: addoil 2 """
 
   def do_stir(self, line):
@@ -132,7 +132,7 @@ class MakeRecipeCommand(cmd.Cmd):
 
   def help_stir(self):
     print """ Command to lower the stirrer and stir the contents in the utensil for num_secs
-              seconds. Ensure that this move can be executed. e.g. robotic arm is out of the
+              seconds. Ensure that this move can be executed. e.g. cup dispenser is out of the
               way, lid is open, pumps are off
               Usage: stir 60 """
 
@@ -148,27 +148,16 @@ class MakeRecipeCommand(cmd.Cmd):
   def help_temp(self):
     print """ Command to activate the stove controller to set and maintain the temperature
               of the contents in the utensil at target_temperature *C. Ensure that this
-              move can be executed. e.g. robotic arm is out of the way, lid is open.
+              move can be executed. e.g. cup dispenser is out of the way, lid is open.
               This operation is cancelled if an operation that moves the platform is executed.
               Usage: temp 80 """
 
   def do_addcup(self, line):
     try:
-      vals = line.split()
-      if len(vals)!=2:
-        raise ValueError("invalid number of arguments")
-      cup_num = int(vals[1])
-      cup_size = vals[0].strip().lower()
-      is_cup_small = False
-      if cup_size == 'medium':
-        is_cup_small = False
-      elif cup_size == 'small':
-        is_cup_small = True
-      else:
-        raise ValueError("cup_size has to be one of {small, medium}")
-        self.add_time_step_to_recipe()
-        self.recipe.add_step(Step("addcup",[is_cup_small, cup_num]))
-        self.sous_chef.add_cup(is_cup_small, cup_num)
+      cup_num = int(line)
+      self.add_time_step_to_recipe()
+      self.recipe.add_step(Step("addcup",[cup_num]))
+      self.sous_chef.add_cup(cup_num)
     except Exception, e:
       print "Error:" + str(e)
                          
@@ -318,7 +307,7 @@ class SousChefMain(cmd.Cmd):
         elif step.name == "temp":
           sous_chef.set_temperature_in_celcius(step.step_args[0])
         elif step.name == "addcup":
-          sous_chef.add_cup(step.step_args[0], step.step_args[1])
+          sous_chef.add_cup(step.step_args[0])
         elif step.name == "delay":
           time.sleep(step.step_args[0])
         elif step.name == "done":
