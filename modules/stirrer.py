@@ -42,10 +42,10 @@ class Stirrer:
   # Diameters of the three different all-clad utensils
   utensil_diameter_mm = [200.0, 270.0, 150.0]
 
-  platform_pos_for_cup = [(180, 0), # SmallCup1
-                          (180, 0), # SmallCup2
-                          (180, 0), # LargeCup1
-                          (180, 0)] # LargeCup2
+  platform_pos_for_cup = [(330,  60), # SmallCup1
+                          ( 30, 205), # SmallCup2
+                          (  0, 180), # LargeCup1
+                          (  0, 180)] # LargeCup2
 
   def __init__(self,
                x_rail_dir_pin, x_rail_step_pin, x_rail_enable_pin,
@@ -199,7 +199,7 @@ class Stirrer:
     self.move_to(Stirrer.platform_pos_for_cup[cup_idx][0],
                  Stirrer.platform_pos_for_cup[cup_idx][1])
     self.platform_position = PlatformPosition.IN_BETWEEN
-    
+
   def shutdown(self):
     self.position_platform_at_base()
 
