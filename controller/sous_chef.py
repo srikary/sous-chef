@@ -14,7 +14,7 @@ class SousChef:
     GPIO.setmode(GPIO.BCM)
     self.servo_driver_enable_pin = config.getint("CupDispenser", "modules.servo.enable_bcm_pin")
     GPIO.setup(self.servo_driver_enable_pin, GPIO.OUT)
-    GPIO.output(self.servo_driver_enable_pin, GPIO.HIGH)
+    GPIO.output(self.servo_driver_enable_pin, GPIO.LOW)
     self.lid = lid.Lid(config.getint("Lid", "modules.lid.servo.channel"),
                        config.getint("Lid", "modules.lid.servo.open_pos"))
 
@@ -112,3 +112,7 @@ class SousChef:
     self.oil_pump.shutdown()
     self.cup_dispenser.shutdown()
     self.stirrer.shutdown()
+
+if (__name__ == "__main__"):
+  sous_chef = SousChef(0, conf_file="config/sous-chef.conf")
+  sous_chef.add_cup(1)
