@@ -72,5 +72,5 @@ if (__name__ == "__main__"):
   pump.dispense_tbsp(1)
   print "First Part done"
   time.sleep(5)
-  pump.dispense_cup(0.25)
+  pump.dispense_cup(1)
   print "Second Part done"

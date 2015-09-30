@@ -49,7 +49,6 @@ class Servo:
   def set_angle(self, angle):
     if (angle < 0 or angle > 180):
       raise ValueError("Destination position invalid:" + str(angle))
-    print "SetAngle:" + str(angle)
     self.curr_pos = angle
     self.pwm.setPWM(self.driver_channel, 0, self.angle_to_quantile[angle])
 

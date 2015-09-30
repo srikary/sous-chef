@@ -62,6 +62,12 @@ class SousChef:
       raise ValueError("Cannot move platform. Raise lid before moving the platform.")
     self.stirrer.position_platform_at_utensil()
 
+  def ensure_or_position_platform_at_base(self):
+    if not self.lid.is_open():
+      raise ValueError("Cannot move platform. Raise lid before moving the platform.")
+    self.stirrer.stirrer_up()
+    self.stirrer.position_platform_at_base()
+
   def prepare_to_stir(self):
     if self.water_pump.is_open() or self.oil_pump.is_open():
       raise ValueError("Cannot move platform. One of the pumps is On")
@@ -83,11 +89,11 @@ class SousChef:
     self.lid.close()
 
   def add_water_in_cups(self, num_cups):
-    self.ensure_or_position_platform_over_utensil()
+    self.ensure_or_position_platform_at_base()
     self.water_pump.dispense_cup(num_cups)
 
   def add_oil_in_tbsp(self, num_tbsp):
-    self.ensure_or_position_platform_over_utensil()
+    self.ensure_or_position_platform_at_base()
     self.oil_pump.dispense_tbsp(num_tbsp)
 
   def stir(self, num_secs):
