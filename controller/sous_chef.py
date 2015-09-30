@@ -5,6 +5,7 @@ import modules.stirrer as stirrer
 import modules.stove_controller as stove_controller
 import ConfigParser
 import RPi.GPIO as GPIO
+import time
 
 class SousChef:
   def __init__(self, utensil_index, conf_file="./config/sous-chef.conf"):
@@ -13,9 +14,6 @@ class SousChef:
     config.read(conf_file)
     GPIO.setmode(GPIO.BCM)
     self.servo_driver_enable_pin = config.getint("CupDispenser", "modules.servo.enable_bcm_pin")
-    GPIO.setup(self.servo_driver_enable_pin, GPIO.OUT)
-    GPIO.output(self.servo_driver_enable_pin, GPIO.LOW)
-    self.lid = lid.Lid(config.getint("Lid", "modules.lid.servo.channel"))
 
     self.water_pump = pump.Pump(config.getint("WaterPump", "modules.water_pump.relay.bcm_pin"),
                                 config.getint("WaterPump", "modules.water_pump.prime_time_msec"),
@@ -25,11 +23,13 @@ class SousChef:
                               config.getint("OilPump", "modules.oil_pump.prime_time_msec"),
                               config.getint("OilPump", "modules.oil_pump.time_per_ml_msec"))
 
+    #GPIO.setup(self.servo_driver_enable_pin, GPIO.OUT)
+    #GPIO.output(self.servo_driver_enable_pin, GPIO.LOW)
+    self.lid = lid.Lid(config.getint("Lid", "modules.lid.servo.channel"))
     self.cup_dispenser = cup_dispenser.CupDispenser(config.getint("CupDispenser", "modules.dispenser.small_cup1.channel"),
                                                     config.getint("CupDispenser", "modules.dispenser.small_cup2.channel"),
                                                     config.getint("CupDispenser", "modules.dispenser.large_cup1.channel"),
                                                     config.getint("CupDispenser", "modules.dispenser.large_cup2.channel"))
-
     self.stirrer = stirrer.Stirrer(config.getint("Stirrer", "modules.stirrer.x_rail.dir_pin"),
                                    config.getint("Stirrer", "modules.stirrer.x_rail.step_pin"),
                                    config.getint("Stirrer", "modules.stirrer.x_rail.enable_pin"),
@@ -43,6 +43,7 @@ class SousChef:
     self.stove_controller = stove_controller.StoveController(config.getint("StoveController", "modules.stove_controller.servo.channel"),
                                                              config.getint("StoveController", "modules.stove_controller.switch.bcm_pin"),
                                                              config.getint("StoveController", "modules.stove_controller.sampling_interval_sec"))
+    self.cup_dispenser.reset()
 
   def prepare_to_move(self):
     if self.water_pump.is_open() or self.oil_pump.is_open():
@@ -62,7 +63,7 @@ class SousChef:
     self.stirrer.position_platform_at_utensil()
 
   def prepare_to_stir(self):
-    if self.water_pump.is_open() or self.oil_pump.is_open:
+    if self.water_pump.is_open() or self.oil_pump.is_open():
       raise ValueError("Cannot move platform. One of the pumps is On")
     if not self.cup_dispenser.are_all_on_hold():
       raise ValueError("Cannot move platform. Let the cup dispenser finish dispensing.")
@@ -114,8 +115,10 @@ class SousChef:
 
 if (__name__ == "__main__"):
   sous_chef = SousChef(0, conf_file="./config/sous-chef.conf")
+  inp = raw_input("-->")
   sous_chef.add_cup(1)
-  sous_chef.add_cup(2)
-  sous_chef.add_cup(3)
-  sous_chef.add_cup(4)
+  sous_chef.close_lid()
+  time.sleep(2)
+  sous_chef.open_lid()
+  #sous_chef.stir(30)
   sous_chef.shutdown()

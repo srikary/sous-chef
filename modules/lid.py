@@ -2,8 +2,8 @@ from drivers.servo_driver import Servo
 
 class Lid:
   """ Interface to the Lid."""
-  open_pos = 0
-  close_pos = 180
+  open_pos = 180
+  close_pos = 0
   def __init__(self, lid_servo_channel):
     """
         lid_servo_channel: Provide the channel (on the Servo driver) that the
