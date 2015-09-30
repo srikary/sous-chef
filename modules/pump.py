@@ -21,24 +21,24 @@ class Pump:
     self.close()
     self.prime_time_msec = prime_time_msec
     self.time_per_ml_msec = time_per_ml_msec
-    self.prime()
+    #self.prime() #TODO(remove in prod)
 
   def open(self):
     if self.open_high:
       GPIO.output(self.switch_bcm_pin, GPIO.HIGH)
     else:
       GPIO.output(self.switch_bcm_pin, GPIO.LOW)
-    self.is_open = True
+    self.is_pump_open = True
 
   def is_open(self):
-    return self.is_open
+    return self.is_pump_open
 
   def close(self):
     if self.open_high:
       GPIO.output(self.switch_bcm_pin, GPIO.LOW)
     else:
       GPIO.output(self.switch_bcm_pin, GPIO.HIGH)
-    self.is_open = False
+    self.is_pump_open = False
 
   def run_pump_for_msec(self, msec):
     secs = float(msec)/1000;
@@ -66,9 +66,11 @@ class Pump:
     self.close()
 
 if (__name__ == "__main__"):
-  pump = Pump(12, 5000, 20)
+  pump = Pump(24, 5000, 20, open_high=False)
   print "Primed"
+  time.sleep(5)
   pump.dispense_tbsp(1)
   print "First Part done"
+  time.sleep(5)
   pump.dispense_cup(0.25)
   print "Second Part done"

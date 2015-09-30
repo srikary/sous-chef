@@ -13,8 +13,8 @@ def get_curr_time_in_secs():
 
 class Stirrer:
   # Dimensions of the Rails
-  max_x_rail_translation_mm = 370.0
-  max_y_rail_translation_mm = 315.0
+  max_x_rail_translation_mm = 345.0
+  max_y_rail_translation_mm = 290.0
   max_z_rail_translation_mm = 100.0
   z_rotations_per_mm = 0.79
 
@@ -22,17 +22,17 @@ class Stirrer:
   z_up_pos = 0
   z_mid_pos = 85.0
   z_down_pos = 100.0
-  x_utensil_pos = 180.0
-  y_utensil_pos = 142.0
+  x_utensil_pos = 171.0
+  y_utensil_pos = 122.0
 
-  x_lid_utensil_pos = 180.0
-  y_lid_utensil_pos = 305.0
+  x_lid_utensil_pos = 171.0
+  y_lid_utensil_pos = 280.0
 
   x_home_pos = 0.0
   y_home_pos = 0.0
 
-  stirrer_x_offset = 45
-  stirrer_y_offset = 45
+  stirrer_x_offset = 50
+  stirrer_y_offset = 50
 
   stirrer_width_mm = 58.0
 
@@ -42,10 +42,10 @@ class Stirrer:
   # Diameters of the three different all-clad utensils
   utensil_diameter_mm = [200.0, 270.0, 150.0]
 
-  platform_pos_for_cup = [(330,  60), # SmallCup1
-                          ( 30, 205), # SmallCup2
-                          (  0, 180), # LargeCup1
-                          (  0, 180)] # LargeCup2
+  platform_pos_for_cup = [( 310,  45), # SmallCup1
+                          (  35, 197), # SmallCup2
+                          ( 171,   0), # LargeCup1
+                          ( 171,   0)] # LargeCup2
 
   def __init__(self,
                x_rail_dir_pin, x_rail_step_pin, x_rail_enable_pin,
@@ -138,7 +138,7 @@ class Stirrer:
     self.z_rail.move_to(Stirrer.z_down_pos)
 
   def is_stirrer_up(self):
-    return self.z_rail.get_curr_pos_mm == Stirrer.z_up_pos
+    return abs(self.z_rail.get_curr_pos_mm() - Stirrer.z_up_pos) <= 2
 
   def position_platform_at_utensil(self):
     self.stirrer_up()
@@ -196,8 +196,8 @@ class Stirrer:
     if cup_num < 1 or cup_num > 4:
       raise ValueError("Cup number has to be one of {1, 2, 3, 4}")
     cup_idx = cup_num - 1
-    self.move_to(Stirrer.platform_pos_for_cup[cup_idx][0],
-                 Stirrer.platform_pos_for_cup[cup_idx][1])
+    self.move_to((Stirrer.platform_pos_for_cup[cup_idx][0],
+                 Stirrer.platform_pos_for_cup[cup_idx][1]))
     self.platform_position = PlatformPosition.IN_BETWEEN
 
   def shutdown(self):

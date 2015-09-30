@@ -23,7 +23,10 @@ class CupDispenser:
     self.all_on_hold=False
     servo.move_to(hold_pos)
     servo.move_to(dispense_pos)
-    time.sleep(3)
+    time.sleep(1)
+    servo.move_to(hold_pos)
+    servo.move_to(dispense_pos)
+    time.sleep(1)
     servo.move_to(hold_pos)
     self.all_on_hold=True
 
