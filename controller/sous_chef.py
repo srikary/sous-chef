@@ -44,6 +44,7 @@ class SousChef:
                                                              config.getint("StoveController", "modules.stove_controller.switch.bcm_pin"),
                                                              config.getint("StoveController", "modules.stove_controller.sampling_interval_sec"))
     self.cup_dispenser.reset()
+    self.lid.open()
 
   def prepare_to_move(self):
     if self.water_pump.is_open() or self.oil_pump.is_open():
@@ -103,7 +104,7 @@ class SousChef:
 
 
   def set_temperature_in_celcius(self, temperature):
-    self.ensure_or_position_platform_over_utensil()
+    self.ensure_or_position_platform_at_base()
     self.stove_controller.set_temperature_C(temperature)
 
   def add_cup(self, cup_num):

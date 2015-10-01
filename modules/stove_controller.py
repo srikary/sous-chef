@@ -66,6 +66,7 @@ class StoveController:
     return self.is_on
 
   def set_temperature_from_percentage(self, percentage):
+    print "Dest %: " + str(percentage)
     target_value = int((float(abs(StoveController.low_pos - StoveController.high_pos)) * percentage)/ 100)
     self.servo.move_to(target_value)
 
@@ -75,7 +76,9 @@ class StoveController:
     self.temp_pid_controller.set_new_setpoint(temperature)
 
   def get_temperature_C(self):
-    return self.temp_sensor.readObjTempC()
+    temp = self.temp_sensor.readObjTempC()
+    print "Current Temp: " + str(temp) + "*C"
+    return temp
 
 if (__name__ == "__main__"):
   controller = StoveController(17, 12)

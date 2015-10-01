@@ -141,7 +141,7 @@ class MakeRecipeCommand(cmd.Cmd):
       target_temp = float(line)
       self.add_time_step_to_recipe()
       self.recipe.add_step(Step("temp",[target_temp]))
-      self.sous_chef.set_temperature_in_celcius(target_temperature)
+      self.sous_chef.set_temperature_in_celcius(target_temp)
     except Exception, e:
       print "Error:" + str(e)
 

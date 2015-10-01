@@ -25,7 +25,7 @@ class Lid:
     return self.is_lid_open
 
   def shutdown(self):
-    self.open()
+    self.close()
 
 if (__name__ == "__main__"):
   lid = Lid(4)

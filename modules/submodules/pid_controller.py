@@ -58,7 +58,6 @@ class PIDController(threading.Thread):
       # print self.is_enabled
       if self.is_enabled:
         new_manipulated_variable = self.compute_manipulated_variable()
-        print "New Dest:" + str(new_manipulated_variable)
         if new_manipulated_variable is not None:
           self.set_manipulated_variable(new_manipulated_variable)
       elif self.should_stop:
@@ -84,7 +83,7 @@ class PIDController(threading.Thread):
     if point == None or derivative == None:
       return None
     self.integral = self.integral + point
-    print "Values Integral: " + str(self.integral) + ", Point: " + str(point) + ", Derivative: " + str(derivative)
+    #print "Values Integral: " + str(self.integral) + ", Point: " + str(point) + ", Derivative: " + str(derivative)
     new_value = (self.P * point) + (self.I * self.integral * self.sampling_interval_s) + (self.D * derivative)
     if new_value < 0 or new_value > 100:
       new_value = max(0, min(new_value, 100))
