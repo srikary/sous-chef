@@ -66,11 +66,10 @@ class Pump:
     self.close()
 
 if (__name__ == "__main__"):
-  pump = Pump(24, 5000, 20, open_high=False)
+  pump = Pump(23, 5000, 20, open_high=False)
   print "Primed"
-  time.sleep(5)
-  pump.dispense_tbsp(1)
-  print "First Part done"
-  time.sleep(5)
-  pump.dispense_cup(1)
-  print "Second Part done"
+  while True:
+    inp = raw_input("-->")
+    qty = float(inp)
+    pump.run_pump_for_msec(qty)
+    #pump.dispense_cup(1)

@@ -57,6 +57,7 @@ if (__name__ == "__main__"):
   x_stepper = StepperAxis(7, 8, 19, 6000, inc_clockwise=False)
   z_stepper = StepperAxis(9, 10, 21,
           max_translation_mm=6000, inc_clockwise=True, speed=120, rotations_per_mm=0.79)
+  #z_stepper.curr_pos_mm = 85
   r_stepper = StepperAxis(6, 5, 26, 6000, inc_clockwise=False)
   while True:
     inp = raw_input("-->")
