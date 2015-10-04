@@ -1,5 +1,6 @@
 import submodules.stepper_axis as stepper_axis
 import math
+import random
 import time
 
 class PlatformPosition:
@@ -173,21 +174,18 @@ class Stirrer:
   # Y axis is the bottom rail and increases from ATX to front.
   def stir(self, utensil_index, stir_for_seconds):
     self.position_platform_at_utensil()
-    self.stirrer_down()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     stir_dx = -10
     top_to_bottom = True
     start_time = get_curr_time_in_secs()
+    distances = range(int(utensil_radius + stir_dx), int(-utensil_radius), stir_dx)
     while True:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
-      for dist_from_center in range(int(utensil_radius), int(-utensil_radius), stir_dx):
-        self.one_stir_stroke(dist_from_center, utensil_index, top_to_bottom)
-        top_to_bottom = not top_to_bottom
-        current = get_curr_time_in_secs()
-        if (current  - start_time) > stir_for_seconds:
-          break
+      dist_from_center = random.choice(distances)
+      self.one_stir_stroke(dist_from_center, utensil_index, top_to_bottom)
+      top_to_bottom = not top_to_bottom
     self.stirrer_up()
     self.position_platform_at_base()
 

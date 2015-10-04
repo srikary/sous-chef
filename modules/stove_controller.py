@@ -41,7 +41,7 @@ class StoveController:
                                                             20, # setpoint
                                                             sampling_interval_s,
                                                             self.get_temperature_C,
-                                                            self.set_temperature_from_percentage)
+                                                            self.set_knobpos_from_percentage)
     self.temp_pid_controller.start()
 
   def on(self):
@@ -65,7 +65,7 @@ class StoveController:
   def is_on(self):
     return self.is_on
 
-  def set_temperature_from_percentage(self, percentage):
+  def set_knobpos_from_percentage(self, percentage):
     target_value = int((float(abs(StoveController.low_pos - StoveController.high_pos)) * percentage)/ 100)
     self.servo.move_to(target_value)
 
@@ -77,6 +77,10 @@ class StoveController:
   def get_temperature_C(self):
     return self.temp_sensor.readObjTempC()
 
+  def set_knobpos(self, pos):
+    self.hold_freeze()
+    self.set_knobpos_from_percentage(self, pos)
+    
 if (__name__ == "__main__"):
   controller = StoveController(17, 12)
   print "Before" + str(controller.get_temperature_C())
