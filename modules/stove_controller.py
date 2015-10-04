@@ -33,7 +33,7 @@ class StoveController:
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(self.switch_bcm_pin, GPIO.OUT)
     self.off()
-    self.temp_sensor = TMP006.TMP006()
+    self.temp_sensor = TMP006.TMP006(address=0x41)
     self.temp_sensor.begin()
     self.temp_pid_controller = pid_controller.PIDController(StoveController.kP,
                                                             StoveController.kI,
@@ -81,7 +81,7 @@ class StoveController:
     return temp
 
 if (__name__ == "__main__"):
-  controller = StoveController(17, 12)
+  controller = StoveController(5, 12)
   print "Before" + str(controller.get_temperature_C())
   controller.set_temperature_C(60)
   for i in range(0, 100):
