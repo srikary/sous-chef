@@ -156,13 +156,9 @@ class MakeRecipeCommand(cmd.Cmd):
   def do_knobpos(self, line):
     try:
       target_pos = float(line)
-      print "C1"
       self.add_time_step_to_recipe()
-      print "C2"
       self.recipe.add_step(Step("knobpos",[target_pos]))
-      print "C3"
       self.sous_chef.set_knobpos(target_pos)
-      print "C4"
     except Exception, e:
       print "Error:" + str(e)
 
