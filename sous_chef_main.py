@@ -156,9 +156,13 @@ class MakeRecipeCommand(cmd.Cmd):
   def do_knobpos(self, line):
     try:
       target_pos = float(line)
+      print "C1"
       self.add_time_step_to_recipe()
+      print "C2"
       self.recipe.add_step(Step("knobpos",[target_pos]))
+      print "C3"
       self.sous_chef.set_knobpos(target_pos)
+      print "C4"
     except Exception, e:
       print "Error:" + str(e)
 
@@ -168,7 +172,7 @@ class MakeRecipeCommand(cmd.Cmd):
     stove is switched off if the position is 0 and is switched on for any
     other position. Position is specified as a percentage.
     Usage: knobpos 80 """
-    
+
   def do_addcup(self, line):
     try:
       cup_num = int(line)

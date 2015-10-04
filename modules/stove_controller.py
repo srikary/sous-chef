@@ -16,10 +16,10 @@ import Adafruit_TMP.TMP006 as TMP006
 
 class StoveController:
   """ Interface to the Stove/HotPlate."""
-  high_pos = 0
-  low_pos = 180
-  kP = 0.8 # Set these values appropriately.
-  kI = 0.5
+  high_pos = 180
+  low_pos = 0
+  kP = 0.3 # Set these values appropriately.
+  kI = 0.1
   kD = 0.0
 
   def __init__(self, servo_channel, switch_bcm_pin, sampling_interval_s = 5):
@@ -64,11 +64,13 @@ class StoveController:
 
   def is_on(self):
     return self.is_on
-  
+
   def set_knobpos_from_percentage(self, percentage):
+    if percentage < 0 or percentage > 100:
+      raise ValueError("KnobPos is set through percentage. Needs to be in [0, 100]")
     print "Dest %: " + str(percentage)
     target_value = int((float(abs(StoveController.low_pos - StoveController.high_pos)) * percentage)/ 100)
-    self.servo.move_to(target_value)
+    self.servo.move_to(int(StoveController.low_pos + target_value))
 
   # Public methods
   def set_temperature_C(self, temperature):
@@ -82,13 +84,15 @@ class StoveController:
 
   def set_knobpos(self, pos):
     self.hold_freeze()
-    self.set_knobpos_from_percentage(self, pos)
-    
+    self.set_knobpos_from_percentage(pos)
+
 if (__name__ == "__main__"):
   controller = StoveController(5, 12)
   print "Before" + str(controller.get_temperature_C())
-  controller.set_temperature_C(60)
-  for i in range(0, 100):
-    print "After" + str(controller.get_temperature_C())
-    time.sleep(10)
+
+  #controller.set_temperature_C(60)
+  #for i in range(0, 100):
+  #  time.sleep(5)
+  controller.set_knobpos(5)
+  time.sleep(10)
   controller.shutdown()

@@ -3,7 +3,7 @@ import time
 
 class CupDispenser:
   cup_positions = [(175, 65), # Hold, Dispense positions
-                   (130, 27),
+                   (65, 170),
                    (163, 45),
                    (161, 45)]
 

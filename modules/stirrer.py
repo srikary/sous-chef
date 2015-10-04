@@ -21,13 +21,13 @@ class Stirrer:
 
 
   z_up_pos = 0
-  z_mid_pos = 85.0
-  z_down_pos = 96.0
+  z_mid_pos = 87.0
+  z_down_pos =99.0
   x_utensil_pos = 171.0
   y_utensil_pos = 122.0
 
   x_lid_utensil_pos = 171.0
-  y_lid_utensil_pos = 280.0
+  y_lid_utensil_pos = 287.0
 
   x_home_pos = 0.0
   y_home_pos = 0.0
@@ -44,7 +44,7 @@ class Stirrer:
   utensil_diameter_mm = [200.0, 270.0, 150.0]
 
   platform_pos_for_cup = [( 310,  45), # SmallCup1
-                          (  35, 197), # SmallCup2
+                          (  35,  52), # SmallCup2
                           ( 171,   0), # LargeCup1
                           ( 171,   0)] # LargeCup2
 
@@ -59,7 +59,7 @@ class Stirrer:
             Stirrer.max_y_rail_translation_mm, speed=90)
     self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin,
             max_translation_mm=Stirrer.max_z_rail_translation_mm,
-            inc_clockwise=True, speed=240, rotations_per_mm=Stirrer.z_rotations_per_mm)
+            inc_clockwise=True, speed=180, rotations_per_mm=Stirrer.z_rotations_per_mm)
     self.position_platform_at_base()
 
   def disable(self):

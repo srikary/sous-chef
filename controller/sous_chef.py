@@ -112,7 +112,7 @@ class SousChef:
       self.stove_controller.off()
     else:
       self.stove_controller.on()
-      
+
   def add_cup(self, cup_num):
     self.prepare_to_move()
     self.stirrer.position_platform_for_cup(cup_num)
@@ -129,9 +129,10 @@ class SousChef:
 if (__name__ == "__main__"):
   sous_chef = SousChef(0, conf_file="./config/sous-chef.conf")
   inp = raw_input("-->")
-  sous_chef.add_cup(1)
-  sous_chef.close_lid()
-  time.sleep(2)
+  sous_chef.set_knobpos(50)
+  #sous_chef.add_cup(1)
+  #sous_chef.close_lid()
+  #time.sleep(2)
   sous_chef.open_lid()
   #sous_chef.stir(30)
   sous_chef.shutdown()
