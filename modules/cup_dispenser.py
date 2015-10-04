@@ -13,9 +13,9 @@ class CupDispenser:
                large_cup1_servo_channel,
                large_cup2_servo_channel):
     self.small_cup1_servo = Servo(small_cup1_servo_channel, CupDispenser.cup_positions[0][0], move_delay=0.001)
-    self.small_cup2_servo = Servo(small_cup2_servo_channel, CupDispenser.cup_positions[1][0], move_delay=0.01)
-    self.large_cup1_servo = Servo(large_cup1_servo_channel, CupDispenser.cup_positions[2][0], move_delay=0.01)
-    self.large_cup2_servo = Servo(large_cup2_servo_channel, CupDispenser.cup_positions[3][0], move_delay=0.01)
+    self.small_cup2_servo = Servo(small_cup2_servo_channel, CupDispenser.cup_positions[1][0], move_delay=0.001)
+    self.large_cup1_servo = Servo(large_cup1_servo_channel, CupDispenser.cup_positions[2][0], move_delay=0.001)
+    self.large_cup2_servo = Servo(large_cup2_servo_channel, CupDispenser.cup_positions[3][0], move_delay=0.001)
     self.reset()
     self.all_on_hold=True
 
@@ -23,7 +23,10 @@ class CupDispenser:
     self.all_on_hold=False
     servo.move_to(hold_pos)
     servo.move_to(dispense_pos)
-    time.sleep(3)
+    time.sleep(1)
+    servo.move_to(hold_pos)
+    servo.move_to(dispense_pos)
+    time.sleep(1)
     servo.move_to(hold_pos)
     self.all_on_hold=True
 

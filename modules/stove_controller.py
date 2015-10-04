@@ -33,7 +33,7 @@ class StoveController:
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(self.switch_bcm_pin, GPIO.OUT)
     self.off()
-    self.temp_sensor = TMP006.TMP006()
+    self.temp_sensor = TMP006.TMP006(address=0x41)
     self.temp_sensor.begin()
     self.temp_pid_controller = pid_controller.PIDController(StoveController.kP,
                                                             StoveController.kI,
@@ -64,8 +64,9 @@ class StoveController:
 
   def is_on(self):
     return self.is_on
-
+  
   def set_knobpos_from_percentage(self, percentage):
+    print "Dest %: " + str(percentage)
     target_value = int((float(abs(StoveController.low_pos - StoveController.high_pos)) * percentage)/ 100)
     self.servo.move_to(target_value)
 
@@ -75,14 +76,16 @@ class StoveController:
     self.temp_pid_controller.set_new_setpoint(temperature)
 
   def get_temperature_C(self):
-    return self.temp_sensor.readObjTempC()
+    temp = self.temp_sensor.readObjTempC()
+    print "Current Temp: " + str(temp) + "*C"
+    return temp
 
   def set_knobpos(self, pos):
     self.hold_freeze()
     self.set_knobpos_from_percentage(self, pos)
     
 if (__name__ == "__main__"):
-  controller = StoveController(17, 12)
+  controller = StoveController(5, 12)
   print "Before" + str(controller.get_temperature_C())
   controller.set_temperature_C(60)
   for i in range(0, 100):

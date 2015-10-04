@@ -4,7 +4,7 @@ class StepperAxis:
 
   """ Represents an axis controlled by a stepper motor """
   def __init__(self, dir_pin, step_pin, enable_pin, max_translation_mm, speed=60,
-               inc_clockwise=True, rotations_per_mm = (float(1)/35)):
+               inc_clockwise=True, rotations_per_mm = (float(8)/256.5)):
     self.stepper = stepper.StepperMotor(dir_pin, step_pin, enable_pin, speed)
     self.inc_clockwise = inc_clockwise
     self.curr_pos_mm = 0
@@ -57,6 +57,7 @@ if (__name__ == "__main__"):
   x_stepper = StepperAxis(7, 8, 19, 6000, inc_clockwise=False)
   z_stepper = StepperAxis(9, 10, 21,
           max_translation_mm=6000, inc_clockwise=True, speed=120, rotations_per_mm=0.79)
+  #z_stepper.curr_pos_mm = 85
   r_stepper = StepperAxis(6, 5, 26, 6000, inc_clockwise=False)
   while True:
     inp = raw_input("-->")
