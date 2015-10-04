@@ -153,6 +153,22 @@ class MakeRecipeCommand(cmd.Cmd):
     is cancelled if an operation that moves the platform is executed.
     Usage: temp 80 """
 
+  def do_knobpos(self, line):
+    try:
+      target_pos = float(line)
+      self.add_time_step_to_recipe()
+      self.recipe.add_step(Step("knobpos",[target_pos]))
+      self.sous_chef.set_knobpos(target_pos)
+    except Exception, e:
+      print "Error:" + str(e)
+
+  def help_knobpos(self):
+    print """   Command to activate the stove controller to disable the pid
+    controller and set the position of the knob to the specified value. The
+    stove is switched off if the position is 0 and is switched on for any
+    other position. Position is specified as a percentage.
+    Usage: knobpos 80 """
+    
   def do_addcup(self, line):
     try:
       cup_num = int(line)
@@ -309,6 +325,8 @@ class SousChefMain(cmd.Cmd):
           sous_chef.stir(step.step_args[0])
         elif step.name == "temp":
           sous_chef.set_temperature_in_celcius(step.step_args[0])
+        elif step.name == "knobpos":
+          sous_chef.set_knobpos(step.step_args[0])
         elif step.name == "addcup":
           sous_chef.add_cup(step.step_args[0])
         elif step.name == "delay":

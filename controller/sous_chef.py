@@ -102,11 +102,17 @@ class SousChef:
     self.ensure_or_position_platform_over_utensil()
     self.stirrer.stir(self.utensil_index, num_secs)
 
-
   def set_temperature_in_celcius(self, temperature):
     self.ensure_or_position_platform_at_base()
     self.stove_controller.set_temperature_C(temperature)
 
+  def set_knobpos(self, pos):
+    self.stove_controller.set_knobpos(pos)
+    if pos == 0:
+      self.stove_controller.off()
+    else:
+      self.stove_controller.on()
+      
   def add_cup(self, cup_num):
     self.prepare_to_move()
     self.stirrer.position_platform_for_cup(cup_num)
