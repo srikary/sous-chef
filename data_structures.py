@@ -12,7 +12,8 @@ class Step:
                "temp",
                "addcup",
                "delay",
-               "done"])
+               "done",
+               "knobpos"])
   
   def __init__(self, name='', args='', json_dict=None):
     if json_dict == None:
