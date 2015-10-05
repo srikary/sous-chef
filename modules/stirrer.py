@@ -21,7 +21,7 @@ class Stirrer:
 
 
   z_up_pos = 0
-  z_mid_pos = 87.0
+  z_mid_pos = 75.0
   z_down_pos =99.0
   x_utensil_pos = 171.0
   y_utensil_pos = 122.0
@@ -35,10 +35,10 @@ class Stirrer:
   stirrer_x_offset = 52
   stirrer_y_offset = 46
 
-  stirrer_width_mm = 58.0
+  stirrer_width_mm = 56.0
 
-  stir_start_gap = 10.0 # Distance from utensil wall where the stirrer starts a stroke.
-  stir_stop_gap = 20.0 # Distance from utensil wall where the stirrer stops during a stroke.
+  stir_start_gap = 4.0 # Distance from utensil wall where the stirrer starts a stroke.
+  stir_stop_gap = 40.0 # Distance from utensil wall where the stirrer stops during a stroke.
 
   # Diameters of the three different all-clad utensils
   utensil_diameter_mm = [200.0, 270.0, 150.0]
@@ -68,25 +68,29 @@ class Stirrer:
     self.z_rail.disable()
 
   def move_to(self, dest_pos):
-    start_pos = (self.x_rail.get_curr_pos_mm(), self.y_rail.get_curr_pos_mm())
+    start_pos = (self.x_rail.get_curr_pos_mm(), self.y_rail.get_curr_pos_mm(), self.z_rail.get_curr_pos_mm())
     delta = ((dest_pos[0] - self.x_rail.get_curr_pos_mm()),
-             (dest_pos[1] - self.y_rail.get_curr_pos_mm()))
-    max_delta = max(abs(delta[0]), abs(delta[1]))
+             (dest_pos[1] - self.y_rail.get_curr_pos_mm()),
+             (dest_pos[2] - self.z_rail.get_curr_pos_mm()))
+    max_delta = max(abs(delta[0]), abs(delta[1]), abs(delta[2]))
 
     for i in range(1, int(max_delta + 1)):
       next_x = start_pos[0] + ((float(i) / max_delta) * delta[0])
       next_y = start_pos[1] + ((float(i) / max_delta) * delta[1])
+      next_z = start_pos[2] + ((float(i) / max_delta) * delta[2])
       self.x_rail.move_to(next_x)
       self.y_rail.move_to(next_y)
+      self.z_rail.move_to(next_z)
     self.x_rail.move_to(dest_pos[0])
     self.y_rail.move_to(dest_pos[1])
+    self.z_rail.move_to(dest_pos[2])
 
   def execute_stir_stroke(self, start_pos, end_pos):
     self.stirrer_mid()
-    self.move_to(start_pos)
+    self.move_to((start_pos[0], start_pos[1], Stirrer.z_mid_pos))
     self.stirrer_down()
-    self.move_to(end_pos)
-    self.stirrer_mid()
+    self.move_to((end_pos[0], end_pos[1], Stirrer.z_mid_pos))
+    self.stirrer_mid() # Should already be here from the above move_to
 
   def get_cord_length_mm(self, dist_from_center, utensil_index):
     if utensil_index >= 3:
@@ -99,7 +103,7 @@ class Stirrer:
     return 2 * math.sqrt((utensil_radius * utensil_radius) - (dist_from_center * dist_from_center))
 
   def one_stir_stroke(self, dist_from_center, utensil_index, top_to_bottom):
-    print "Stroke:" + str(dist_from_center)+ ", " + str(top_to_bottom)
+    #print "Stroke:" + str(dist_from_center)+ ", " + str(top_to_bottom)
     stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     # Compute the max height that the stirrer can stir on this stroke
@@ -108,7 +112,7 @@ class Stirrer:
       edge_dist_from_center = dist_from_center - stirrer_width_half
     # This stroke will keep the edge out of bounds. Return without doing anything.
     if abs(edge_dist_from_center) >= utensil_radius:
-        return
+      return
     cord_length = self.get_cord_length_mm(edge_dist_from_center, utensil_index)
 
     # Coordinates for the center of the platform for which the stirrer is at the
@@ -124,7 +128,7 @@ class Stirrer:
     else:
       start_y = stirrer_y_center - (cord_length / 2) + Stirrer.stir_start_gap
       end_y = start_y + cord_length - Stirrer.stir_stop_gap - Stirrer.stir_start_gap
-    print "Executing stroke: " + repr(x_delta) + ", " + repr(start_y) + ", " + repr(end_y)
+    #print "Executing stroke: " + repr(x_delta) + ", " + repr(start_y) + ", " + repr(end_y)
     self.execute_stir_stroke((x_delta, start_y), (x_delta, end_y))
 
   ################  Public methods. #################
@@ -194,8 +198,8 @@ class Stirrer:
     if cup_num < 1 or cup_num > 4:
       raise ValueError("Cup number has to be one of {1, 2, 3, 4}")
     cup_idx = cup_num - 1
-    self.move_to((Stirrer.platform_pos_for_cup[cup_idx][0],
-                 Stirrer.platform_pos_for_cup[cup_idx][1]))
+    self.x_rail.move_to(Stirrer.platform_pos_for_cup[cup_idx][0])
+    self.y_rail.move_to(Stirrer.platform_pos_for_cup[cup_idx][1])
     self.platform_position = PlatformPosition.IN_BETWEEN
 
   def shutdown(self):
