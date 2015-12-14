@@ -183,7 +183,7 @@ class MakeRecipeCommand(cmd.Cmd):
     identified by the cup number to the utensil. Ensure that this
     move can be executed. e.g. platform is not obstructing the path
     of the arm. i.e. it is over the utensil.
-    Usage: addcup small 1 """
+    Usage: addcup 1 """
 
   def do_done(self, line):
     self.add_time_step_to_recipe()

@@ -5,7 +5,7 @@ class CupDispenser:
   cup_positions = [(175, 65), # Hold, Dispense positions
                    (65, 170),
                    (163, 45),
-                   (161, 45)]
+                   (155, 45)]
 
   def __init__(self,
                small_cup1_servo_channel,

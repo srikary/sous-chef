@@ -1,0 +1,101 @@
+{
+  "total_time_secs": 700.0, 
+  "steps": [
+    {
+      "name": "delay", 
+      "step_args": [
+        8.0
+      ]
+    }, 
+    {
+      "name": "stir", 
+      "step_args": [
+        50
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        288.0
+      ]
+    }, 
+    {
+      "name": "addcup", 
+      "step_args": [
+        2
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        12.0
+      ]
+    }, 
+    {
+      "name": "addcup", 
+      "step_args": [
+        3
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        9.0
+      ]
+    }, 
+    {
+      "name": "addcup", 
+      "step_args": [
+        4
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        23.0
+      ]
+    }, 
+    {
+      "name": "stir", 
+      "step_args": [
+        100
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        212.0
+      ]
+    }, 
+    {
+      "name": "addwater", 
+      "step_args": [
+        0.25
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        14.0
+      ]
+    }, 
+    {
+      "name": "addwater", 
+      "step_args": [
+        1.0
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        130.0
+      ]
+    }, 
+    {
+      "name": "done", 
+      "step_args": []
+    }
+  ], 
+  "name": "test4", 
+  "utensil_size": 0
+}

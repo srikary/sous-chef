@@ -19,7 +19,7 @@ class StoveController:
   high_pos = 180
   low_pos = 0
   kP = 0.3 # Set these values appropriately.
-  kI = 0.1
+  kI = 0.001
   kD = 0.0
 
   def __init__(self, servo_channel, switch_bcm_pin, sampling_interval_s = 5):

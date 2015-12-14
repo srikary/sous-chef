@@ -21,8 +21,8 @@ class Stirrer:
 
 
   z_up_pos = 0
-  z_mid_pos = 75.0
-  z_down_pos =99.0
+  z_mid_pos = 83.0
+  z_down_pos =98.0
   x_utensil_pos = 171.0
   y_utensil_pos = 122.0
 
@@ -74,7 +74,7 @@ class Stirrer:
              (dest_pos[2] - self.z_rail.get_curr_pos_mm()))
     max_delta = max(abs(delta[0]), abs(delta[1]), abs(delta[2]))
 
-    for i in range(1, int(max_delta + 1)):
+    for i in range(1, int(max_delta + 1), 5):
       next_x = start_pos[0] + ((float(i) / max_delta) * delta[0])
       next_y = start_pos[1] + ((float(i) / max_delta) * delta[1])
       next_z = start_pos[2] + ((float(i) / max_delta) * delta[2])
@@ -89,7 +89,7 @@ class Stirrer:
     self.stirrer_mid()
     self.move_to((start_pos[0], start_pos[1], Stirrer.z_mid_pos))
     self.stirrer_down()
-    self.move_to((end_pos[0], end_pos[1], Stirrer.z_mid_pos))
+    self.move_to((end_pos[0], end_pos[1], random.randrange(Stirrer.z_down_pos, Stirrer.z_mid_pos)))
     self.stirrer_mid() # Should already be here from the above move_to
 
   def get_cord_length_mm(self, dist_from_center, utensil_index):
@@ -212,10 +212,10 @@ if (__name__ == "__main__"):
 
   stirrer.position_platform_at_utensil()
   print "At Utensil"
-  time.sleep(10)
+  time.sleep(2)
   stirrer.position_platform_at_lid()
   print "At Lid"
-  time.sleep(10)
+  time.sleep(2)
   stirrer.stir(0, 50)
   print "Done stirring"
   time.sleep(10)
