@@ -122,10 +122,15 @@ class MakeRecipeCommand(cmd.Cmd):
 
   def do_stir(self, line):
     try:
-      num_secs = int(line)
+      vals = line.split()
+      num_secs = int(vals[0])
+      is_low_stir=False
+      if vals[1].strip() is 'low':
+        is_low_stir = True
+
       self.add_time_step_to_recipe()
-      self.recipe.add_step(Step("stir",[num_secs]))
-      self.sous_chef.stir(num_secs)
+      self.recipe.add_step(Step("stir",[num_secs, is_low_stir]))
+      self.sous_chef.stir(num_secs, is_low_stir)
     except Exception, e:
       print "Error:" + str(e)
 
@@ -133,8 +138,8 @@ class MakeRecipeCommand(cmd.Cmd):
     print """         Command to lower the stirrer and stir the
     contents in the utensil for num_secs seconds. Ensure that this move
     can be executed. e.g. cup dispenser is out of the way, lid is open,
-    pumps are off
-    Usage: stir 60 """
+    pumps are off. Can stir low or high.
+    Usage: stir 60 low"""
 
   def do_temp(self, line):
     try:
@@ -322,7 +327,7 @@ class SousChefMain(cmd.Cmd):
         elif step.name == "addoil":
           sous_chef.add_oil_in_tbsp(step.step_args[0])
         elif step.name == "stir":
-          sous_chef.stir(step.step_args[0])
+          sous_chef.stir(step.step_args[0], step.step_args[1])
         elif step.name == "temp":
           sous_chef.set_temperature_in_celcius(step.step_args[0])
         elif step.name == "knobpos":

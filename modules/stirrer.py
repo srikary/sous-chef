@@ -21,7 +21,7 @@ class Stirrer:
 
 
   z_up_pos = 0
-  z_mid_pos = 70.0
+  z_mid_pos = 55.0
   z_down_pos = max_z_rail_translation_mm
   x_utensil_pos = 171.0
   y_utensil_pos = 122.0
@@ -37,8 +37,9 @@ class Stirrer:
 
   stirrer_width_mm = 60.0
 
+  low_stir_gap = 5.0
   stir_start_gap = 5.0 # Distance from utensil wall where the stirrer starts a stroke.
-  stir_stop_gap = 30.0 # Distance from utensil wall where the stirrer stops during a stroke.
+  stir_stop_gap = 45.0 # Distance from utensil wall where the stirrer stops during a stroke.
 
   # Diameters of the three different all-clad utensils
   utensil_diameter_mm = [200.0, 270.0, 150.0]
@@ -87,16 +88,14 @@ class Stirrer:
 
   def move_to(self, dest_pos):
     start_pos = (self.x_rail.get_curr_pos_mm(), self.y_rail.get_curr_pos_mm(), self.z_rail.get_curr_pos_mm())
+    self.z_rail.move_to(dest_pos[2])
     self.x_rail.move_to(dest_pos[0])
     self.y_rail.move_to(dest_pos[1])
-    self.z_rail.move_to(dest_pos[2])
 
   def execute_stir_stroke(self, start_pos, end_pos):
-    self.stirrer_mid()
-    self.move_to((start_pos[0], start_pos[1], Stirrer.z_mid_pos))
+    self.move_to((start_pos[0], start_pos[1], start_pos[2]))
     self.stirrer_down()
-    self.move_to((end_pos[0], end_pos[1], Stirrer.z_down_pos))
-    self.stirrer_mid() # Should already be here from the above move_to
+    self.move_to((end_pos[0], end_pos[1], end_pos[2]))
 
   def get_cord_length_mm(self, dist_from_center, utensil_index):
     if utensil_index >= 3:
@@ -108,7 +107,7 @@ class Stirrer:
 
     return 2 * math.sqrt((utensil_radius * utensil_radius) - (dist_from_center * dist_from_center))
 
-  def one_stir_stroke(self, dist_from_center, utensil_index, top_to_bottom):
+  def one_stir_stroke(self, dist_from_center, utensil_index, top_to_bottom, is_low_stir):
     #print "Stroke:" + str(dist_from_center)+ ", " + str(top_to_bottom)
     stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
@@ -135,7 +134,14 @@ class Stirrer:
       start_y = stirrer_y_center - (cord_length / 2) + Stirrer.stir_start_gap
       end_y = start_y + cord_length - Stirrer.stir_stop_gap - Stirrer.stir_start_gap
     #print "Executing stroke: " + repr(x_delta) + ", " + repr(start_y) + ", " + repr(end_y)
-    self.execute_stir_stroke((x_delta, start_y), (x_delta, end_y))
+    if is_low_stir:
+      this_stroke_up_pos = Stirrer.z_down_pos - low_stir_gap
+    else:
+      full_stroke_length = Stirrer.z_down_pos - Stirrer.z_mid_pos
+      this_stroke_length = (float(utensil_radius - abs(dist_from_center))/utensil_radius)* full_stroke_length
+      this_stroke_up_pos = Stirrer.z_down_pos - this_stroke_length
+
+    self.execute_stir_stroke((x_delta, start_y, this_stroke_up_pos), (x_delta, end_y, Stirrer.z_down_pos))
 
   ################  Public methods. #################
 
@@ -186,7 +192,7 @@ class Stirrer:
 
   # X axis is the top rail and increases left to right (looking FROM ATX)
   # Y axis is the bottom rail and increases from ATX to front.
-  def stir(self, utensil_index, stir_for_seconds):
+  def stir(self, utensil_index, stir_for_seconds, is_low_stir=False):
     self.position_platform_at_utensil()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     top_to_bottom = True
@@ -196,7 +202,7 @@ class Stirrer:
       if (current  - start_time) > stir_for_seconds:
         break
       dist_from_center = self.get_random_distance(utensil_radius - Stirrer.stir_start_gap)
-      self.one_stir_stroke(dist_from_center, utensil_index, top_to_bottom)
+      self.one_stir_stroke(dist_from_center, utensil_index, top_to_bottom, is_low_stir)
       top_to_bottom = not top_to_bottom
     self.stirrer_up()
     self.position_platform_at_base()
@@ -224,7 +230,7 @@ if (__name__ == "__main__"):
   stirrer.position_platform_at_lid()
   print "At Lid"
   time.sleep(2)
-  stirrer.stir(0, 150)
+  stirrer.stir(0, 150, is_low_stir=False)
   print "Done stirring"
   time.sleep(10)
   stirrer.position_platform_at_base()
