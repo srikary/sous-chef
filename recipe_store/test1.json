@@ -1,0 +1,161 @@
+{
+  "total_time_secs": 315.0, 
+  "steps": [
+    {
+      "name": "delay", 
+      "step_args": [
+        16.0
+      ]
+    }, 
+    {
+      "name": "knobpos", 
+      "step_args": [
+        50.0
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        11.0
+      ]
+    }, 
+    {
+      "name": "knobpos", 
+      "step_args": [
+        0.0
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        16.0
+      ]
+    }, 
+    {
+      "name": "knobpos", 
+      "step_args": [
+        100.0
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        7.0
+      ]
+    }, 
+    {
+      "name": "knobpos", 
+      "step_args": [
+        0.0
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        9.0
+      ]
+    }, 
+    {
+      "name": "knobpos", 
+      "step_args": [
+        50.0
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        10.0
+      ]
+    }, 
+    {
+      "name": "addcup", 
+      "step_args": [
+        1
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        11.0
+      ]
+    }, 
+    {
+      "name": "addcup", 
+      "step_args": [
+        2
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        11.0
+      ]
+    }, 
+    {
+      "name": "addcup", 
+      "step_args": [
+        3
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        9.0
+      ]
+    }, 
+    {
+      "name": "addcup", 
+      "step_args": [
+        4
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        17.0
+      ]
+    }, 
+    {
+      "name": "addwater", 
+      "step_args": [
+        0.5
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        8.0
+      ]
+    }, 
+    {
+      "name": "addoil", 
+      "step_args": [
+        1.0
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        65.0
+      ]
+    }, 
+    {
+      "name": "stir", 
+      "step_args": [
+        50
+      ]
+    }, 
+    {
+      "name": "delay", 
+      "step_args": [
+        124.0
+      ]
+    }, 
+    {
+      "name": "done", 
+      "step_args": []
+    }
+  ], 
+  "name": "test1", 
+  "utensil_size": 0
+}

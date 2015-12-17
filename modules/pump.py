@@ -66,10 +66,11 @@ class Pump:
     self.close()
 
 if (__name__ == "__main__"):
-  pump = Pump(23, 5000, 20, open_high=False)
+  water_pump = Pump(23, 5000, 20, open_high=False)
+  oil_pump = Pump(24, 5000, 20, open_high=False)
   print "Primed"
   while True:
     inp = raw_input("-->")
     qty = float(inp)
-    pump.run_pump_for_msec(qty)
+    oil_pump.run_pump_for_msec(qty)
     #pump.dispense_cup(1)

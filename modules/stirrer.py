@@ -21,7 +21,7 @@ class Stirrer:
 
 
   z_up_pos = 0
-  z_mid_pos = 87.0
+  z_mid_pos = 70.0
   z_down_pos = max_z_rail_translation_mm
   x_utensil_pos = 171.0
   y_utensil_pos = 122.0
@@ -38,7 +38,7 @@ class Stirrer:
   stirrer_width_mm = 60.0
 
   stir_start_gap = 5.0 # Distance from utensil wall where the stirrer starts a stroke.
-  stir_stop_gap = 40.0 # Distance from utensil wall where the stirrer stops during a stroke.
+  stir_stop_gap = 30.0 # Distance from utensil wall where the stirrer stops during a stroke.
 
   # Diameters of the three different all-clad utensils
   utensil_diameter_mm = [200.0, 270.0, 150.0]
@@ -54,9 +54,9 @@ class Stirrer:
                z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin):
     # TODO : Fill in values to the constructor below.
     self.x_rail = stepper_axis.StepperAxis(x_rail_dir_pin, x_rail_step_pin, x_rail_enable_pin,
-            Stirrer.max_x_rail_translation_mm, inc_clockwise=False, speed=90)
+            Stirrer.max_x_rail_translation_mm, inc_clockwise=False, speed=150)
     self.y_rail = stepper_axis.StepperAxis(y_rail_dir_pin, y_rail_step_pin, y_rail_enable_pin,
-            Stirrer.max_y_rail_translation_mm, speed=90)
+            Stirrer.max_y_rail_translation_mm, speed=150)
     self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin,
             max_translation_mm=Stirrer.max_z_rail_translation_mm,
             inc_clockwise=True, speed=220, rotations_per_mm=Stirrer.z_rotations_per_mm)
