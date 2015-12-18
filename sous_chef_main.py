@@ -124,13 +124,11 @@ class MakeRecipeCommand(cmd.Cmd):
     try:
       vals = line.split()
       num_secs = int(vals[0])
-      is_low_stir=False
-      if vals[1].strip() is 'low':
-        is_low_stir = True
+      stir_height_index=int(vals[1])
 
       self.add_time_step_to_recipe()
-      self.recipe.add_step(Step("stir",[num_secs, is_low_stir]))
-      self.sous_chef.stir(num_secs, is_low_stir)
+      self.recipe.add_step(Step("stir",[num_secs, stir_height_index]))
+      self.sous_chef.stir(num_secs, stir_height_index)
     except Exception, e:
       print "Error:" + str(e)
 

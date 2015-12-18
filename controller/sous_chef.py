@@ -97,10 +97,10 @@ class SousChef:
     self.ensure_or_position_platform_at_base()
     self.oil_pump.dispense_tbsp(num_tbsp)
 
-  def stir(self, num_secs, is_low_stir):
+  def stir(self, num_secs, stir_height_index):
     self.prepare_to_stir()
     self.ensure_or_position_platform_over_utensil()
-    self.stirrer.stir(self.utensil_index, num_secs, is_low_stir)
+    self.stirrer.stir(self.utensil_index, num_secs, stir_height_index)
 
   def set_temperature_in_celcius(self, temperature):
     self.ensure_or_position_platform_at_base()
@@ -134,5 +134,5 @@ if (__name__ == "__main__"):
   #sous_chef.close_lid()
   #time.sleep(2)
   sous_chef.open_lid()
-  #sous_chef.stir(30, is_low_stir=False)
+  #sous_chef.stir(30, stir_height_index=4)
   sous_chef.shutdown()
