@@ -106,18 +106,18 @@ class Stirrer:
 
     return 2 * math.sqrt((utensil_radius * utensil_radius) - (dist_from_center * dist_from_center))
 
-  def one_stir_stroke(self, dist_from_center, utensil_index, top_to_bottom, stir_height_index):
+  def one_stir_stroke(self, stirrer_dist_from_center, utensil_index, top_to_bottom, stir_height_index):
     #print "Stroke:" + str(dist_from_center)+ ", " + str(top_to_bottom)
     stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     # Compute the max height that the stirrer can stir on this stroke
-    stirrer_dist_from_center = dist_from_center - stirrer_width_half
-    if dist_from_center < 0:
-      stirrer_dist_from_center = dist_from_center + stirrer_width_half
+    edge_dist_from_center = stirrer_dist_from_center + stirrer_width_half
+    if stirrer_dist_from_center < 0:
+      edge_dist_from_center = stirrer_dist_from_center - stirrer_width_half
     # This stroke will keep the edge out of bounds. Return without doing anything.
-    if abs(dist_from_center) >= utensil_radius:
+    if abs(edge_dist_from_center) >= utensil_radius:
       return
-    cord_length = self.get_cord_length_mm(dist_from_center, utensil_index)
+    cord_length = self.get_cord_length_mm(edge_dist_from_center, utensil_index)
 
     # Coordinates for the center of the platform for which the stirrer is at the
     # center of the utensil
@@ -137,7 +137,7 @@ class Stirrer:
       this_stroke_up_pos = Stirrer.z_down_pos - Stirrer.stirring_height[stir_height_index]
     else:
       full_stroke_length = Stirrer.stirring_height[stir_height_index]
-      this_stroke_length = (float(utensil_radius - abs(dist_from_center))/utensil_radius)* full_stroke_length
+      this_stroke_length = (float(utensil_radius - abs(edge_dist_from_center))/utensil_radius)* full_stroke_length
       this_stroke_up_pos = Stirrer.z_down_pos - this_stroke_length
 
     self.execute_stir_stroke((x_delta, start_y, this_stroke_up_pos), (x_delta, end_y, Stirrer.z_down_pos))
@@ -194,13 +194,14 @@ class Stirrer:
   def stir(self, utensil_index, stir_for_seconds, stir_height_index=4):
     self.position_platform_at_utensil()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
+    stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
     top_to_bottom = True
     start_time = get_curr_time_in_secs()
     while True:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
-      dist_from_center = self.get_random_distance(utensil_radius - Stirrer.stir_start_gap)
+      dist_from_center = self.get_random_distance(utensil_radius - Stirrer.stir_start_gap - stirrer_width_half)
       self.one_stir_stroke(dist_from_center, utensil_index, top_to_bottom, stir_height_index)
       top_to_bottom = not top_to_bottom
     self.stirrer_up()
