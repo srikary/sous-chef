@@ -37,7 +37,7 @@ class Stirrer:
 
   stirrer_width_mm = 60.0
 
-  stirring_height = [5.0, 10.0, 20.0, 35.0, 50.0]
+  stirring_height = [5.0, 10.0, 20.0, 35.0, 60.0]
   stir_start_gap = 5.0 # Distance from utensil wall where the stirrer starts a stroke.
   stir_stop_gap = 45.0 # Distance from utensil wall where the stirrer stops during a stroke.
 
@@ -87,7 +87,6 @@ class Stirrer:
     self.z_rail.move_to(dest_pos[2])
 
   def move_to(self, dest_pos):
-    start_pos = (self.x_rail.get_curr_pos_mm(), self.y_rail.get_curr_pos_mm(), self.z_rail.get_curr_pos_mm())
     self.z_rail.move_to(dest_pos[2])
     self.x_rail.move_to(dest_pos[0])
     self.y_rail.move_to(dest_pos[1])
@@ -224,15 +223,14 @@ if (__name__ == "__main__"):
                    11, 25, 20, # Y Dir, Step, Enable
                    9, 10, 21)  # Z Dir, Step, Enable
 
-  stirrer.position_platform_at_utensil()
+  #stirrer.position_platform_at_utensil()
   print "At Utensil"
-  time.sleep(2)
-  stirrer.position_platform_at_lid()
+  #time.sleep(2)
+  #stirrer.position_platform_at_lid()
   print "At Lid"
-  time.sleep(2)
-  stirrer.stir(0, 150, stir_height_index=4)
+  #time.sleep(2)
+  stirrer.stir(0, 50, stir_height_index=0)
   print "Done stirring"
-  time.sleep(10)
+  #time.sleep(10)
   stirrer.position_platform_at_base()
   print "At Base"
-  time.sleep(10)
