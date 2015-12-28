@@ -1,11 +1,16 @@
 import RPi.GPIO as GPIO
 import time
 
+def get_curr_time_in_secs():
+  return time.time()
+
 class StepperMotor:
   """ Wrapper interface to a stepper motor. """
 
   steps_per_rotation = 200
   min_delay_per_step = 0.001
+  acceleration = 0.9 # revolutions/s^2
+  innitial_velocity = 0.1
 
   def __init__(self, dir_pin, step_pin, enable_pin, speed=90):
     GPIO.setmode(GPIO.BCM)
@@ -18,7 +23,7 @@ class StepperMotor:
     GPIO.output(self.step_pin, GPIO.LOW)
     GPIO.setup(self.enable_pin, GPIO.OUT)
     self.disable()
-    self.delay_per_step = self.get_step_delay_from_speed(speed)
+    self.set_speed(speed)
 
   def enable(self):
     GPIO.output(self.enable_pin, GPIO.LOW)
@@ -26,9 +31,8 @@ class StepperMotor:
   def disable(self):
     GPIO.output(self.enable_pin, GPIO.HIGH)
 
-  def get_step_delay_from_speed(self, speed):
-    """ Converts the speed (in rpm) to the delay between each step """
-    rotations_per_second = float(speed) / 60
+  def get_step_delay_from_speed(self, rotations_per_second):
+    """ Converts the speed (in rps) to the delay between each step """
     steps_per_second = rotations_per_second * StepperMotor.steps_per_rotation
     time_per_step = float(1.0)/steps_per_second
     return (time_per_step - StepperMotor.min_delay_per_step)
@@ -41,15 +45,33 @@ class StepperMotor:
       GPIO.output(self.direction_pin, GPIO.LOW)
 
     num_steps = int(num_rotations * StepperMotor.steps_per_rotation)
+    velocity = StepperMotor.initial_velocity
+    acc = StepperMotor.acceleration
+    prev_time = get_curr_time_in_secs()
+    half_way = num_steps / 2
+    deceleration_point = num_steps
     for i in range(0, num_steps):
       GPIO.output(self.step_pin, GPIO.HIGH)
       time.sleep(0.001)
       GPIO.output(self.step_pin, GPIO.LOW)
-      time.sleep(self.delay_per_step)
+      curr_time = get_curr_time_in_secs()
+      dt = curr_time - prev_time
+      prev_time = curr_time
+      velocity += acc * dt
+      step_delay = self.get_step_delay_from_speed(velocity)
+      time.sleep(step_delay)
+      # Once we've hit max velocity or accelerated upto halfway we
+      # set acceleration to 0.
+      if acc > 0 and (i >= num_steps or velocity >= self.speed_rps):
+        acc = 0
+        deceleration_point = num_steps - i
+      if acc > 0 and i >= deceleration_point:
+        acc = -StepperMotor.acceleration
     return float(num_steps)/ StepperMotor.steps_per_rotation
 
   def set_speed(self, speed):
-    self.delay_per_step = self.get_step_delay_from_speed(speed)
+    self.speed_rps = float(speed)/60
+    self.delay_per_step = self.get_step_delay_from_speed(self.speed_rps)
 
   def rotate_at_speed(self, speed, dir_is_clockwise, num_rotations):
     self.set_speed(speed)

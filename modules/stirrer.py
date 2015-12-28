@@ -280,7 +280,7 @@ class Stirrer:
     circular_stir_time = int(stir_for_seconds * 0.3)
     linear_stir_time = stir_for_seconds - circular_stir_time
     self.stir_linear(utensil_index, linear_stir_time, stir_height_index)
-    self.stir_circular(utensil_index, linear_stir_time, stir_height_index)
+    self.stir_circular(utensil_index, circular_stir_time, stir_height_index)
 
   def position_platform_for_cup(self, cup_num):
     self.stirrer_up()
@@ -306,7 +306,7 @@ if (__name__ == "__main__"):
   print "At Lid"
   #time.sleep(2)
   stirrer.stir(0, 50, stir_height_index=3)
-  #stirrer.stir_circular(0, 50, stir_height_index=3, stir_radius_index=5, rotate_clockwise=False)
+  #stirrer.stir_circular(0, 50, stir_height_index=3)
   #stirrer.position_along_radius_at_angle(100, math.pi/2)
   #stirrer.one_circular_stir_stroke(100, True)
   time.sleep(10)
