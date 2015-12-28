@@ -115,10 +115,12 @@ class Stirrer:
     dy = math.sin(angle) * utensil_radius
     if dx > 0:
       dx = dx - stirrer_width_half
+      dx_p = dx - Stirrer.stirrer_width_mm
     else:
       dx = dx + stirrer_width_half
+      dx_p = dx + Stirrer.stirrer_width_mm
 
-    stirrer_edge_pos = self.get_dist(dx, dy)
+    stirrer_edge_pos = self.get_dist(dx_p, dy)
     if  stirrer_edge_pos > utensil_radius:
       raise ValueError("Stirrer cannot be positioned at this angle:" + str(angle))
     return (dx, dy)
@@ -237,32 +239,48 @@ class Stirrer:
     stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
     top_to_bottom = True
     start_time = get_curr_time_in_secs()
+    distances = [0 , 60, -60, -20, 20, 80, -80, -40, 40]
+    index = 0
     while True:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
-      dist_from_center = self.get_random_distance(utensil_radius - Stirrer.stir_start_gap - stirrer_width_half)
+      dist_from_center = distances[index]
+      index += 1
+      index %= len(distances)
       self.one_linear_stir_stroke(dist_from_center, utensil_index, top_to_bottom, stir_height_index)
       top_to_bottom = not top_to_bottom
     self.stirrer_up()
     self.position_platform_at_base()
 
-  def stir_circular(self, utensil_index, stir_for_seconds, stir_height_index, stir_radius_index=5, rotate_clockwise=True):
+  def stir_circular(self, utensil_index, stir_for_seconds, stir_height_index):
     self.position_platform_at_utensil()
     self.stirrer_mid()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     this_stroke_down_pos = Stirrer.z_down_pos - Stirrer.stirring_height[stir_height_index]
-    this_stroke_radius = (float(stir_radius_index)/5)* utensil_radius
     self.position_along_radius_at_angle(this_stroke_radius, 0)
     self.z_rail.move_to(this_stroke_down_pos)
     start_time = get_curr_time_in_secs()
+    rotate_clockwise = True
+    stir_radius_indices = [5, 3, 2]
     while True:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
+      stir_radius_index = stir_radius_indices[radius_index]
+      this_stroke_radius = (float(stir_radius_index)/5)* utensil_radius
       self.one_circular_stir_stroke(this_stroke_radius, rotate_clockwise)
+      rotate_clockwise = not rotate_clockwise
+      radius_index += 1
+      radius_index %= len(stir_radius_indices)
     self.stirrer_up()
     self.position_platform_at_base()
+
+  def stir(self, utensil_index, stir_for_seconds, stir_height_index):
+    circular_stir_time = int(stir_for_seconds * 0.3)
+    linear_stir_time = stir_for_seconds - circular_stir_time
+    self.stir_linear(utensil_index, linear_stir_time, stir_height_index)
+    self.stir_circular(utensil_index, linear_stir_time, stir_height_index)
 
   def position_platform_for_cup(self, cup_num):
     self.stirrer_up()
@@ -287,9 +305,10 @@ if (__name__ == "__main__"):
   #stirrer.position_platform_at_lid()
   print "At Lid"
   #time.sleep(2)
-  #stirrer.stir_circular(0, 50, stir_height_index=3, stir_radius_index=5, rotate_clockwise=True)
+  stirrer.stir(0, 50, stir_height_index=3)
+  #stirrer.stir_circular(0, 50, stir_height_index=3, stir_radius_index=5, rotate_clockwise=False)
   #stirrer.position_along_radius_at_angle(100, math.pi/2)
-  stirrer.one_circular_stir_stroke(100, True)
+  #stirrer.one_circular_stir_stroke(100, True)
   time.sleep(10)
   print "Done stirring"
   #time.sleep(10)
