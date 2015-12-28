@@ -106,18 +106,19 @@ class Stirrer:
 
     return 2 * math.sqrt((utensil_radius * utensil_radius) - (dist_from_center * dist_from_center))
 
-  def get_dist(dx, dy):
+  def get_dist(self, dx, dy):
     return math.sqrt((dx * dx) + (dy * dy))
-  
-  def get_pos_for_angle(angle, utensil_radius):
+
+  def get_pos_for_angle(self, angle, utensil_radius):
     stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
     dx = math.cos(angle) * utensil_radius
+    dy = math.sin(angle) * utensil_radius
     if dx > 0:
       dx = dx - stirrer_width_half
     else:
       dx = dx + stirrer_width_half
 
-    stirrer_edge_pos = get_dist(dx, dy)
+    stirrer_edge_pos = self.get_dist(dx, dy)
     if  stirrer_edge_pos > utensil_radius:
       raise ValueError("Stirrer cannot be positioned at this angle:" + str(angle))
     return (dx, dy)
@@ -126,12 +127,12 @@ class Stirrer:
     z_pos = self.z_rail.get_curr_pos_mm()
     stirrer_x_center = Stirrer.x_utensil_pos + Stirrer.stirrer_x_offset
     stirrer_y_center = Stirrer.y_utensil_pos + Stirrer.stirrer_y_offset
-    (dx, dy) = get_pos_for_angle(angle, utensil_radius)
+    (dx, dy) = self.get_pos_for_angle(angle, utensil_radius)
     dest = (stirrer_x_center + dx, stirrer_y_center + dy, z_pos)
     self.move_to(dest)
-    
+
   def one_circular_stir_stroke(self, utensil_radius, rotate_clockwise):
-    2pi_by_360 = (2 * math.pi) / 360
+    twopiby360 = (2 * math.pi) / 360
     start = 0
     end = 360
     increment = 1
@@ -141,10 +142,10 @@ class Stirrer:
       increment = -1
     for i in range(start, end, increment):
       try:
-        self.position_along_radius_at_angle(utensil_radius, i * 2pi_by_360)
+        self.position_along_radius_at_angle(utensil_radius, i * twopiby360)
       except ValueError:
         continue
-      
+
   def one_linear_stir_stroke(self, stirrer_dist_from_center, utensil_index, top_to_bottom, stir_height_index):
     #print "Stroke:" + str(dist_from_center)+ ", " + str(top_to_bottom)
     stirrer_width_half = (Stirrer.stirrer_width_mm/ 2)
@@ -227,7 +228,7 @@ class Stirrer:
   def get_random_distance(self, radius):
     angle = random.uniform(0, 2 * math.pi)
     return radius * math.cos(angle)
-  
+
   # X axis is the top rail and increases left to right (looking FROM ATX)
   # Y axis is the bottom rail and increases from ATX to front.
   def stir_linear(self, utensil_index, stir_for_seconds, stir_height_index):
@@ -251,7 +252,7 @@ class Stirrer:
     self.stirrer_mid()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     this_stroke_down_pos = Stirrer.z_down_pos - Stirrer.stirring_height[stir_height_index]
-    this_stroke_radius = (float(stir_radius_index)/5)* utensil-radius
+    this_stroke_radius = (float(stir_radius_index)/5)* utensil_radius
     self.position_along_radius_at_angle(this_stroke_radius, 0)
     self.z_rail.move_to(this_stroke_down_pos)
     start_time = get_curr_time_in_secs()
@@ -259,10 +260,10 @@ class Stirrer:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
-      self.one_circular_stir_stroke(dist_from_center, utensil_index, top_to_bottom, stir_height_index)
+      self.one_circular_stir_stroke(this_stroke_radius, rotate_clockwise)
     self.stirrer_up()
     self.position_platform_at_base()
-    
+
   def position_platform_for_cup(self, cup_num):
     self.stirrer_up()
     if cup_num < 1 or cup_num > 4:
@@ -286,7 +287,10 @@ if (__name__ == "__main__"):
   #stirrer.position_platform_at_lid()
   print "At Lid"
   #time.sleep(2)
-  stirrer.stir_circular(0, 50, stir_height_index=0, stir_radius_index=5, rotate_clockwise=True)
+  #stirrer.stir_circular(0, 50, stir_height_index=3, stir_radius_index=5, rotate_clockwise=True)
+  #stirrer.position_along_radius_at_angle(100, math.pi/2)
+  stirrer.one_circular_stir_stroke(100, True)
+  time.sleep(10)
   print "Done stirring"
   #time.sleep(10)
   stirrer.position_platform_at_base()
