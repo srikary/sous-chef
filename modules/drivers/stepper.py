@@ -9,8 +9,8 @@ class StepperMotor:
 
   steps_per_rotation = 200
   min_delay_per_step = 0.001
-  acceleration = 0.9 # revolutions/s^2
-  innitial_velocity = 0.1
+  acceleration = 28.0 # revolutions/s^2
+  initial_velocity = 0.6
 
   def __init__(self, dir_pin, step_pin, enable_pin, speed=90):
     GPIO.setmode(GPIO.BCM)
@@ -62,16 +62,19 @@ class StepperMotor:
       time.sleep(step_delay)
       # Once we've hit max velocity or accelerated upto halfway we
       # set acceleration to 0.
-      if acc > 0 and (i >= num_steps or velocity >= self.speed_rps):
+      if acc > 0 and (i >= half_way or velocity >= self.speed_rps):
         acc = 0
         deceleration_point = num_steps - i
-      if acc > 0 and i >= deceleration_point:
+      if i >= deceleration_point:
         acc = -StepperMotor.acceleration
     return float(num_steps)/ StepperMotor.steps_per_rotation
 
   def set_speed(self, speed):
     self.speed_rps = float(speed)/60
     self.delay_per_step = self.get_step_delay_from_speed(self.speed_rps)
+
+  def get_speed(self):
+    return self.speed_rps * 60
 
   def rotate_at_speed(self, speed, dir_is_clockwise, num_rotations):
     self.set_speed(speed)

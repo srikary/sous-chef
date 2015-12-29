@@ -17,6 +17,12 @@ class StepperAxis:
   def disable(self):
     self.stepper.disable()
 
+  def get_speed(self):
+    return self.stepper.get_speed()
+
+  def set_speed(self, speed):
+    self.stepper.set_speed(speed)
+
   # Private methods
   def increment_pos_by_mm(self, distance_in_mm):
     if distance_in_mm < 0:
@@ -53,11 +59,11 @@ class StepperAxis:
     return self.curr_pos_mm
 
 if (__name__ == "__main__"):
-  y_stepper = StepperAxis(11, 25, 20, 6000, speed=90)
-  x_stepper = StepperAxis(7, 8, 19, 6000, inc_clockwise=False, speed=90)
+  y_stepper = StepperAxis(11, 25, 20, 6000, speed=150)
+  x_stepper = StepperAxis(7, 8, 19, 6000, inc_clockwise=False, speed=150)
   z_stepper = StepperAxis(9, 10, 21,
           max_translation_mm=6000, inc_clockwise=True, speed=180, rotations_per_mm=0.79)
-  z_stepper.curr_pos_mm = 65
+  #z_stepper.curr_pos_mm = 65
   r_stepper = StepperAxis(6, 5, 26, 6000, inc_clockwise=False)
   while True:
     inp = raw_input("-->")

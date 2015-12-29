@@ -134,6 +134,8 @@ class Stirrer:
     self.move_to(dest)
 
   def one_circular_stir_stroke(self, utensil_radius, rotate_clockwise):
+    old_x_speed = self.x_rail.get_speed()
+    old_y_speed = self.y_rail.get_speed()
     twopiby360 = (2 * math.pi) / 360
     start = 0
     end = 360
@@ -145,8 +147,12 @@ class Stirrer:
     for i in range(start, end, increment):
       try:
         self.position_along_radius_at_angle(utensil_radius, i * twopiby360)
+        self.x_rail.set_speed(270)
+        self.y_rail.set_speed(270)
       except ValueError:
         continue
+    self.x_rail.set_speed(old_x_speed)
+    self.y_rail.set_speed(old_y_speed)
 
   def one_linear_stir_stroke(self, stirrer_dist_from_center, utensil_index, top_to_bottom, stir_height_index):
     #print "Stroke:" + str(dist_from_center)+ ", " + str(top_to_bottom)
@@ -305,11 +311,11 @@ if (__name__ == "__main__"):
   #stirrer.position_platform_at_lid()
   print "At Lid"
   #time.sleep(2)
-  stirrer.stir(0, 50, stir_height_index=3)
+  #stirrer.stir(0, 50, stir_height_index=3)
   #stirrer.stir_circular(0, 50, stir_height_index=3)
   #stirrer.position_along_radius_at_angle(100, math.pi/2)
-  #stirrer.one_circular_stir_stroke(100, True)
-  time.sleep(10)
+  stirrer.one_circular_stir_stroke(100, True)
+  time.sleep(2)
   print "Done stirring"
   #time.sleep(10)
   stirrer.position_platform_at_base()
