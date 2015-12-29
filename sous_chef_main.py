@@ -123,12 +123,20 @@ class MakeRecipeCommand(cmd.Cmd):
   def do_stir(self, line):
     try:
       vals = line.split()
-      num_secs = int(vals[0])
-      stir_height_index=int(vals[1])
+      stir_type = vals[0]
+      num_secs = int(vals[1])
+      stir_height_index=int(vals[2])
 
       self.add_time_step_to_recipe()
-      self.recipe.add_step(Step("stir",[num_secs, stir_height_index]))
-      self.sous_chef.stir(num_secs, stir_height_index)
+      if stir_type is "circular":
+        stir_radius_index=int(vals[3])
+        self.recipe.add_step(Step("stir",[stir_type, num_secs, stir_height_index, stir_radius_index]))
+        self.sous_chef.stir_circular(num_secs, stir_height_index, stir_radius_index)
+      elif stir_type is "linear":
+        self.recipe.add_step(Step("stir",[stir_type, num_secs, stir_height_index]))
+        self.sous_chef.stir_linear(num_secs, stir_height_index)
+      else:
+        raise ValueError(stir_type + " is invalid as stir_type") 
     except Exception, e:
       print "Error:" + str(e)
 
@@ -137,7 +145,7 @@ class MakeRecipeCommand(cmd.Cmd):
     contents in the utensil for num_secs seconds. Ensure that this move
     can be executed. e.g. cup dispenser is out of the way, lid is open,
     pumps are off. Can stir low or high.
-    Usage: stir 60 low"""
+    Usage: stir circular 60 [1-5] [1-5]"""
 
   def do_temp(self, line):
     try:
@@ -325,7 +333,10 @@ class SousChefMain(cmd.Cmd):
         elif step.name == "addoil":
           sous_chef.add_oil_in_tbsp(step.step_args[0])
         elif step.name == "stir":
-          sous_chef.stir(step.step_args[0], step.step_args[1])
+          if len(step.step_args) == 4:
+            sous_chef.stir(step.step_args[0], step.step_args[1], step.step_args[2], step.step_args[3])
+          else:
+            sous_chef.stir(step.step_args[0], step.step_args[1], step.step_args[2])
         elif step.name == "temp":
           sous_chef.set_temperature_in_celcius(step.step_args[0])
         elif step.name == "knobpos":

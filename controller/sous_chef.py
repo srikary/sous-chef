@@ -97,11 +97,16 @@ class SousChef:
     self.ensure_or_position_platform_at_base()
     self.oil_pump.dispense_tbsp(num_tbsp)
 
-  def stir(self, num_secs, stir_height_index):
+  def stir_linear(self, num_secs, stir_height_index):
     self.prepare_to_stir()
     self.ensure_or_position_platform_over_utensil()
-    self.stirrer.stir(self.utensil_index, num_secs, stir_height_index)
+    self.stirrer.stir_linear(self.utensil_index, num_secs, stir_height_index)
 
+  def stir_circular(self, num_secs, stir_height_index, stir_radius_index):
+    self.prepare_to_stir()
+    self.ensure_or_position_platform_over_utensil()
+    self.stirrer.stir_circular(self.utensil_index, num_secs, stir_height_index, stir_radius_index)
+    
   def set_temperature_in_celcius(self, temperature):
     self.ensure_or_position_platform_at_base()
     self.stove_controller.set_temperature_C(temperature)

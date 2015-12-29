@@ -259,7 +259,7 @@ class Stirrer:
     self.stirrer_up()
     self.position_platform_at_base()
 
-  def stir_circular(self, utensil_index, stir_for_seconds, stir_height_index):
+  def stir_circular(self, utensil_index, stir_for_seconds, stir_height_index, stir_radius_index):
     self.position_platform_at_utensil()
     self.stirrer_mid()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
@@ -268,25 +268,15 @@ class Stirrer:
     self.z_rail.move_to(this_stroke_down_pos)
     start_time = get_curr_time_in_secs()
     rotate_clockwise = True
-    stir_radius_indices = [5, 3, 2]
     while True:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
-      stir_radius_index = stir_radius_indices[radius_index]
       this_stroke_radius = (float(stir_radius_index)/5)* utensil_radius
       self.one_circular_stir_stroke(this_stroke_radius, rotate_clockwise)
       rotate_clockwise = not rotate_clockwise
-      radius_index += 1
-      radius_index %= len(stir_radius_indices)
     self.stirrer_up()
     self.position_platform_at_base()
-
-  def stir(self, utensil_index, stir_for_seconds, stir_height_index):
-    circular_stir_time = int(stir_for_seconds * 0.3)
-    linear_stir_time = stir_for_seconds - circular_stir_time
-    self.stir_linear(utensil_index, linear_stir_time, stir_height_index)
-    self.stir_circular(utensil_index, circular_stir_time, stir_height_index)
 
   def position_platform_for_cup(self, cup_num):
     self.stirrer_up()
