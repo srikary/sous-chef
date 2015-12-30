@@ -126,17 +126,17 @@ class MakeRecipeCommand(cmd.Cmd):
       stir_type = vals[0]
       num_secs = int(vals[1])
       stir_height_index=int(vals[2])
-
+      print stir_type
       self.add_time_step_to_recipe()
-      if stir_type is "circular":
+      if stir_type == "circular":
         stir_radius_index=int(vals[3])
         self.recipe.add_step(Step("stir",[stir_type, num_secs, stir_height_index, stir_radius_index]))
         self.sous_chef.stir_circular(num_secs, stir_height_index, stir_radius_index)
-      elif stir_type is "linear":
+      elif stir_type == "linear":
         self.recipe.add_step(Step("stir",[stir_type, num_secs, stir_height_index]))
         self.sous_chef.stir_linear(num_secs, stir_height_index)
       else:
-        raise ValueError(stir_type + " is invalid as stir_type") 
+        raise ValueError(stir_type + " is invalid as stir_type")
     except Exception, e:
       print "Error:" + str(e)
 
