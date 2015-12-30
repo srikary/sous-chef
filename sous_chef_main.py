@@ -126,7 +126,6 @@ class MakeRecipeCommand(cmd.Cmd):
       stir_type = vals[0]
       num_secs = int(vals[1])
       stir_height_index=int(vals[2])
-      print stir_type
       self.add_time_step_to_recipe()
       if stir_type == "circular":
         stir_radius_index=int(vals[3])
