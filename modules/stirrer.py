@@ -205,24 +205,27 @@ class Stirrer:
     return abs(self.z_rail.get_curr_pos_mm() - Stirrer.z_up_pos) <= 2
 
   def position_platform_at_utensil(self):
-    self.stirrer_up()
-    self.x_rail.move_to(Stirrer.x_utensil_pos)
-    self.y_rail.move_to(Stirrer.y_utensil_pos)
-    self.platform_position = PlatformPosition.UTENSIL
+    if not self.is_platform_at_utensil():
+      self.stirrer_up()
+      self.x_rail.move_to(Stirrer.x_utensil_pos)
+      self.y_rail.move_to(Stirrer.y_utensil_pos)
+      self.platform_position = PlatformPosition.UTENSIL
 
   def position_platform_at_base(self):
-    self.stirrer_up()
-    self.x_rail.move_to(Stirrer.x_home_pos)
-    self.y_rail.move_to(Stirrer.y_home_pos)
-    self.platform_position = PlatformPosition.BASE
-    self.disable()
+    if not self.is_platform_at_base():
+      self.stirrer_up()
+      self.x_rail.move_to(Stirrer.x_home_pos)
+      self.y_rail.move_to(Stirrer.y_home_pos)
+      self.platform_position = PlatformPosition.BASE
+      self.disable()
 
   def position_platform_at_lid(self):
-    self.stirrer_up()
-    self.x_rail.move_to(Stirrer.x_lid_utensil_pos)
-    self.y_rail.move_to(Stirrer.y_lid_utensil_pos)
-    self.platform_position = PlatformPosition.LID
-    self.disable()
+    if not self.is_platform_at_lid():
+      self.stirrer_up()
+      self.x_rail.move_to(Stirrer.x_lid_utensil_pos)
+      self.y_rail.move_to(Stirrer.y_lid_utensil_pos)
+      self.platform_position = PlatformPosition.LID
+      self.disable()
 
   def is_platform_at_base(self):
     return self.platform_position == PlatformPosition.BASE
@@ -257,8 +260,8 @@ class Stirrer:
       index %= len(distances)
       self.one_linear_stir_stroke(dist_from_center, utensil_index, top_to_bottom, stir_height_index)
       top_to_bottom = not top_to_bottom
-    self.stirrer_up()
-    self.position_platform_at_base()
+    # self.stirrer_up()
+    # self.position_platform_at_base()
 
   def stir_circular(self, utensil_index, stir_for_seconds, stir_height_index, stir_radius_index):
     self.position_platform_at_utensil()
@@ -276,8 +279,8 @@ class Stirrer:
         break
       self.one_circular_stir_stroke(this_stroke_radius, rotate_clockwise)
       rotate_clockwise = not rotate_clockwise
-    self.stirrer_up()
-    self.position_platform_at_base()
+    # self.stirrer_up()
+    # self.position_platform_at_base()
 
   def position_platform_for_cup(self, cup_num):
     self.stirrer_up()
