@@ -133,7 +133,7 @@ class Stirrer:
     dest = (stirrer_x_center + dx, stirrer_y_center + dy, z_pos)
     self.move_to(dest)
 
-  def one_circular_stir_stroke(self, utensil_radius, rotate_clockwise):
+  def one_circular_stir_stroke(self, stroke_radius, rotate_clockwise):
     old_x_speed = self.x_rail.get_speed()
     old_y_speed = self.y_rail.get_speed()
     twopiby360 = (2 * math.pi) / 360
@@ -146,7 +146,7 @@ class Stirrer:
       increment = -1
     for i in range(start, end, increment):
       try:
-        self.position_along_radius_at_angle(utensil_radius, i * twopiby360)
+        self.position_along_radius_at_angle(stroke_radius, i * twopiby360)
         self.x_rail.set_speed(270)
         self.y_rail.set_speed(270)
       except ValueError:
@@ -268,17 +268,22 @@ class Stirrer:
     # self.stirrer_mid()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     this_stroke_down_pos = Stirrer.z_down_pos - Stirrer.stirring_height[stir_height_index]
-    this_stroke_radius = (float(stir_radius_index)/5)* utensil_radius
-    self.position_along_radius_at_angle(this_stroke_radius, 0)
+    self.position_along_radius_at_angle(utensil_radius, 0)
     self.z_rail.move_to(this_stroke_down_pos)
+    if stir_radius_index < 0:
+      stir_radius_indices = [5, 4, 3, 2, 1, 2, 3 ,4]
+    else:
+      stir_radius_indices = [stir_radius_index]
     start_time = get_curr_time_in_secs()
     rotate_clockwise = True
     while True:
       current = get_curr_time_in_secs()
       if (current  - start_time) > stir_for_seconds:
         break
-      self.one_circular_stir_stroke(this_stroke_radius, rotate_clockwise)
-      rotate_clockwise = not rotate_clockwise
+      for curr_stir_radius_index in stir_radius_indices:
+        this_stroke_radius = (float(curr_stir_radius_index)/5)* utensil_radius
+        self.one_circular_stir_stroke(this_stroke_radius, rotate_clockwise)
+        rotate_clockwise = not rotate_clockwise
     # self.stirrer_up()
     # self.position_platform_at_base()
 
