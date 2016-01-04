@@ -61,7 +61,7 @@ class Stirrer:
     self.z_rail = stepper_axis.StepperAxis(z_rail_dir_pin, z_rail_step_pin, z_rail_enable_pin,
             max_translation_mm=Stirrer.max_z_rail_translation_mm,
             inc_clockwise=True, speed=220, rotations_per_mm=Stirrer.z_rotations_per_mm)
-    self.position_platform_at_base()
+    self.platform_position = PlatformPosition.BASE
 
   def disable(self):
     self.x_rail.disable()
