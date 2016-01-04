@@ -72,5 +72,5 @@ if (__name__ == "__main__"):
   while True:
     inp = raw_input("-->")
     qty = float(inp)
-    oil_pump.run_pump_for_msec(qty)
-    #pump.dispense_cup(1)
+    #oil_pump.run_pump_for_msec(qty)
+    water_pump.run_pump_for_msec(qty)
