@@ -49,12 +49,10 @@ class SousChef:
   def prepare_to_move(self):
     if self.water_pump.is_open() or self.oil_pump.is_open():
       raise ValueError("Cannot move platform. One of the pumps is On")
-    if not self.stirrer.is_stirrer_up():
-      raise ValueError("Cannot move platform. Raise stirrer before moving the platform.")
+    self.stirrer.stirrer_up()
     if not self.cup_dispenser.are_all_on_hold():
       raise ValueError("Cannot move platform. Let the cup dispenser finish dispensing.")
-    if not self.lid.is_open():
-      raise ValueError("Cannot move platform. Raise lid before moving the platform.")
+    self.lid.open()
     self.stove_controller.hold_freeze()
     return True
 
@@ -74,8 +72,7 @@ class SousChef:
       raise ValueError("Cannot move platform. One of the pumps is On")
     if not self.cup_dispenser.are_all_on_hold():
       raise ValueError("Cannot move platform. Let the cup dispenser finish dispensing.")
-    if not self.lid.is_open():
-      raise ValueError("Cannot move platform. Raise lid before moving the platform.")
+    self.lid.open()
     self.ensure_or_position_platform_over_utensil()
     self.stove_controller.hold_freeze()
 

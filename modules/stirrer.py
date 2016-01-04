@@ -265,7 +265,7 @@ class Stirrer:
 
   def stir_circular(self, utensil_index, stir_for_seconds, stir_height_index, stir_radius_index):
     self.position_platform_at_utensil()
-    self.stirrer_mid()
+    # self.stirrer_mid()
     utensil_radius = Stirrer.utensil_diameter_mm[utensil_index]/2
     this_stroke_down_pos = Stirrer.z_down_pos - Stirrer.stirring_height[stir_height_index]
     this_stroke_radius = (float(stir_radius_index)/5)* utensil_radius
