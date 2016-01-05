@@ -42,7 +42,7 @@ class Stirrer:
   stir_stop_gap = 45.0 # Distance from utensil wall where the stirrer stops during a stroke.
 
   # Diameters of the three different all-clad utensils
-  utensil_diameter_mm = [200.0, 205.0, 150.0]
+  utensil_diameter_mm = [200.0, 215.0, 150.0]
 
   platform_pos_for_cup = [( 310,  45), # SmallCup1
                           (  35,  52), # SmallCup2
@@ -281,7 +281,11 @@ class Stirrer:
       if (current  - start_time) > stir_for_seconds:
         break
       for curr_stir_radius_index in stir_radius_indices:
-        this_stroke_radius = (float(curr_stir_radius_index)/5)* utensil_radius
+        if curr_stir_radius_index > 5:
+          # Repurpose index as an actual offset value.
+          this_stroke_radius = utensil_radius + curr_stir_radius_index
+        else:
+          this_stroke_radius = (float(curr_stir_radius_index)/5)* utensil_radius
         self.one_circular_stir_stroke(this_stroke_radius, rotate_clockwise)
         rotate_clockwise = not rotate_clockwise
     # self.stirrer_up()
