@@ -16,7 +16,7 @@ class Stirrer:
   # Dimensions of the Rails
   max_x_rail_translation_mm = 345.0
   max_y_rail_translation_mm = 290.0
-  max_z_rail_translation_mm = 100.0
+  max_z_rail_translation_mm = 99.0
   z_rotations_per_mm = 0.79
 
 
