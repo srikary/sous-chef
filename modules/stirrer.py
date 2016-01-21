@@ -24,7 +24,7 @@ class Stirrer:
   z_mid_pos = 55.0
   z_down_pos = max_z_rail_translation_mm
   x_utensil_pos = 171.0
-  y_utensil_pos = 122.0
+  y_utensil_pos = 111.0
 
   x_lid_utensil_pos = 171.0
   y_lid_utensil_pos = 287.0
@@ -32,7 +32,7 @@ class Stirrer:
   x_home_pos = 0.0
   y_home_pos = 0.0
 
-  stirrer_x_offset = 53
+  stirrer_x_offset = 44
   stirrer_y_offset = 46
 
   stirrer_width_mm = 60.0
