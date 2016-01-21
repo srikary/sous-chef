@@ -334,10 +334,12 @@ class SousChefMain(cmd.Cmd):
         elif step.name == "addoil":
           sous_chef.add_oil_in_tbsp(step.step_args[0])
         elif step.name == "stir":
-          if len(step.step_args) == 4:
-            sous_chef.stir(step.step_args[0], step.step_args[1], step.step_args[2], step.step_args[3])
+          if step.step_args[0] == "circular":
+            sous_chef.stir_circular(step.step_args[1], step.step_args[2], step.step_args[3])
+          elif step.step_args[0] == "linear":
+            sous_chef.stir_linear(step.step_args[1], step.step_args[2])
           else:
-            sous_chef.stir(step.step_args[0], step.step_args[1], step.step_args[2])
+            raise ValueError("Invalid stir type" + step.step_args[0])
         elif step.name == "temp":
           sous_chef.set_temperature_in_celcius(step.step_args[0])
         elif step.name == "knobpos":
